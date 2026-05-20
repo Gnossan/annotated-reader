@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: sans-serif;
+            font-size: 13px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: #1a1610;
+            color: #f5f0e8;
+        }
+
+        #header {
+            padding: 12px 16px;
+            border-bottom: 1px solid #333;
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            opacity: 0.6;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        #exportera {
+            background: transparent;
+            border: 1px solid #444;
+            color: #f5f0e8;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            padding: 3px 8px;
+            opacity: 0.7;
+            letter-spacing: 0.05em;
+        }
+
+        #exportera:hover { opacity: 1; }
+
+        #kontext {
+            padding: 12px 16px;
+            background: #2a2218;
+            border-bottom: 1px solid #333;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        #kontext .fras {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        #kontext .kategori {
+            opacity: 0.6;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        #meddelanden {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .bubbla {
+            padding: 10px 12px;
+            border-radius: 8px;
+            line-height: 1.5;
+            max-width: 90%;
+            white-space: pre-wrap;
+        }
+
+        .bubbla.user {
+            background: #2a2218;
+            align-self: flex-end;
+        }
+
+        .bubbla.assistant {
+            background: #262626;
+            align-self: flex-start;
+        }
+
+        #input-area {
+            padding: 12px;
+            border-top: 1px solid #333;
+            display: flex;
+            gap: 8px;
+        }
+
+        #input {
+            flex: 1;
+            padding: 8px;
+            background: #2a2218;
+            border: 1px solid #444;
+            border-radius: 6px;
+            color: #f5f0e8;
+            font-size: 13px;
+            resize: none;
+            height: 60px;
+        }
+
+        #skicka {
+            padding: 8px 12px;
+            background: #f0c040;
+            color: #1a1610;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            align-self: flex-end;
+        }
+
+        #korsreferera {
+            padding: 8px 10px;
+            background: #2a2218;
+            color: #f5f0e8;
+            border: 1px solid #444;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            align-self: flex-end;
+            title: "Korsreferera annan markering";
+        }
+
+        #korsreferera:hover { border-color: #888; }
+
+        @keyframes studsa {
+            0%, 80%, 100% { transform: translateY(0); opacity: 0.35; }
+            40% { transform: translateY(-5px); opacity: 1; }
+        }
+
+        .ar-tänker {
+            display: flex;
+            gap: 5px;
+            padding: 10px 12px;
+            align-self: flex-start;
+        }
+
+        .ar-tänker span {
+            width: 7px;
+            height: 7px;
+            background: #f5f0e8;
+            border-radius: 50%;
+            animation: studsa 1.2s infinite ease-in-out;
+        }
+
+        .ar-tänker span:nth-child(2) { animation-delay: 0.2s; }
+        .ar-tänker span:nth-child(3) { animation-delay: 0.4s; }
+    </style>
+</head>
+
+<body>
+    <div id="header">
+        <span>Annotated Reader</span>
+        <button id="exportera">↓ Exportera</button>
+    </div>
+    <div id="kontext">
+        <div class="kategori" id="sp-kategori"></div>
+        <div class="fras" id="sp-fras"></div>
+        <div id="sp-beskrivning"></div>
+        <div id="sp-sammanfattning" style="margin-top:6px;opacity:0.7;font-style:italic;font-size:11px;"></div>
+    </div>
+    <div id="meddelanden"></div>
+    <div id="input-area">
+        <button id="korsreferera" title="Korsreferera annan markering">↔</button>
+        <textarea id="input" placeholder="Ställ en fråga..."></textarea>
+        <button id="skicka">→</button>
+    </div>
+    <script src="sidepanel.js"></script>
+</body>
+
+</html>

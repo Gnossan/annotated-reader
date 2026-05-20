@@ -1,0 +1,25 @@
+{
+    "manifest_version": 3,
+    "name": "Annotated Reader",
+    "version": "0.9",
+    "description": "Annoterar webbtext via Claude API",
+    "action": {
+        "default_popup": "popup.html",
+        "default_title": "Annotated Reader"
+    },
+    "permissions": [
+        "activeTab",
+        "scripting",
+        "storage",
+        "sidePanel"
+    ],
+    "host_permissions": [
+        "https://api.anthropic.com/*"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "side_panel": {
+        "default_path": "sidepanel.html"
+    }
+}

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="sv">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Johannes 1 — Annoterad</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Cinzel:wght@400;600&family=Lato:wght@300;400&display=swap');
+
+        :root {
+            --bg: #f5f0e8;
+            --ink: #1a1410;
+            --parchment: #ede5d0;
+            --gold: #8b6914;
+            --gold-light: #c9a84c;
+
+            --cat-titel: #7a2c2c;
+            --cat-vittne: #2c5c7a;
+            --cat-ljus: #5a7a2c;
+            --cat-igan: #6b2c7a;
+
+            --cat-titel-bg: #f5e6e6;
+            --cat-vittne-bg: #e6eff5;
+            --cat-ljus-bg: #edf5e6;
+            --cat-igan-bg: #f2e6f5;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--ink);
+            font-family: 'IM Fell English', Georgia, serif;
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        /* Subtle parchment texture */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        header {
+            text-align: center;
+            padding: 3rem 2rem 1.5rem;
+            border-bottom: 1px solid var(--gold);
+            position: relative;
+        }
+
+        header h1 {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(1.4rem, 4vw, 2.2rem);
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            color: var(--gold);
+        }
+
+        header p {
+            font-style: italic;
+            font-size: 0.95rem;
+            color: #6b5a3a;
+            margin-top: 0.4rem;
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem 1.2rem;
+            justify-content: center;
+            padding: 1.2rem 2rem;
+            border-bottom: 1px solid #d4c8a8;
+            background: var(--parchment);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            font-size: 0.82rem;
+            font-family: 'Lato', sans-serif;
+            font-weight: 400;
+            color: #4a3a22;
+            cursor: pointer;
+            padding: 0.25rem 0.6rem;
+            border-radius: 2px;
+            transition: background 0.15s;
+        }
+
+        .legend-item:hover {
+            background: rgba(0, 0, 0, 0.06);
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .dot-titel {
+            background: var(--cat-titel);
+        }
+
+        .dot-vittne {
+            background: var(--cat-vittne);
+        }
+
+        .dot-ljus {
+            background: var(--cat-ljus);
+        }
+
+        .dot-igan {
+            background: var(--cat-igan);
+        }
+
+        /* Main text */
+        main {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 3rem 2rem 6rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .verse-text {
+            font-size: clamp(1.05rem, 2.5vw, 1.2rem);
+            line-height: 2;
+            color: var(--ink);
+        }
+
+        /* Annotations */
+        .ann {
+            border-radius: 2px;
+            padding: 0.05em 0.15em;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: background 0.15s, border-color 0.15s;
+            position: relative;
+        }
+
+        .ann-titel {
+            background: var(--cat-titel-bg);
+            border-bottom-color: var(--cat-titel);
+            color: var(--cat-titel);
+        }
+
+        .ann-vittne {
+            background: var(--cat-vittne-bg);
+            border-bottom-color: var(--cat-vittne);
+            color: var(--cat-vittne);
+        }
+
+        .ann-ljus {
+            background: var(--cat-ljus-bg);
+            border-bottom-color: var(--cat-ljus);
+            color: var(--cat-ljus);
+        }
+
+        .ann-igan {
+            background: var(--cat-igan-bg);
+            border-bottom-color: var(--cat-igan);
+            color: var(--cat-igan);
+        }
+
+        .ann:hover {
+            filter: brightness(0.92);
+        }
+
+        /* Tooltip */
+        .ann::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: calc(100% + 6px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--ink);
+            color: #f5f0e8;
+            font-family: 'Lato', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 300;
+            white-space: nowrap;
+            padding: 0.3rem 0.6rem;
+            border-radius: 2px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.15s;
+            z-index: 100;
+        }
+
+        .ann:hover::after {
+            opacity: 1;
+        }
+
+        /* Popup overlay */
+        #popup-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(26, 20, 16, 0.55);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #popup-overlay.visible {
+            display: flex;
+        }
+
+        #popup {
+            background: var(--parchment);
+            border: 1px solid var(--gold);
+            max-width: 480px;
+            width: 90%;
+            padding: 2rem;
+            border-radius: 3px;
+            position: relative;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        #popup-category {
+            font-family: 'Cinzel', serif;
+            font-size: 0.72rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            margin-bottom: 0.4rem;
+        }
+
+        #popup-term {
+            font-family: 'IM Fell English', serif;
+            font-size: 1.4rem;
+            font-style: italic;
+            margin-bottom: 0.8rem;
+            color: var(--ink);
+        }
+
+        #popup-desc {
+            font-family: 'Lato', sans-serif;
+            font-size: 0.9rem;
+            line-height: 1.65;
+            color: #3a2e1e;
+            margin-bottom: 1.4rem;
+        }
+
+        #popup-btn {
+            display: inline-block;
+            background: var(--gold);
+            color: #f5f0e8;
+            font-family: 'Cinzel', serif;
+            font-size: 0.8rem;
+            letter-spacing: 0.12em;
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 2px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.15s;
+        }
+
+        #popup-btn:hover {
+            background: var(--gold-light);
+            color: var(--ink);
+        }
+
+        #popup-close {
+            position: absolute;
+            top: 0.8rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            cursor: pointer;
+            color: #8a7a5a;
+            line-height: 1;
+        }
+
+        #popup-close:hover {
+            color: var(--ink);
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Johannes 1</h1>
+        <p>Klicka på markerade fraser för att utforska dem vidare</p>
+    </header>
+
+    <div class="legend">
+        <div class="legend-item"><span class="legend-dot dot-titel"></span>Kristologisk titel</div>
+        <div class="legend-item"><span class="legend-dot dot-vittne"></span>Vittnesbörd</div>
+        <div class="legend-item"><span class="legend-dot dot-ljus"></span>Ljus / mörker</div>
+        <div class="legend-item"><span class="legend-dot dot-igan"></span>Igenkänning</div>
+    </div>
+
+    <main>
+        <p class="verse-text">
+            I begynnelsen fanns <span class="ann ann-titel" data-category="titel" data-term="Ordet"
+                data-desc="Logos — ett av evangeliets mest centrala begrepp. Både det grekiska filosofiska begreppet för kosmisk förnuftsordning och den hebreiska tanken på Guds skapande ord i begynnelsen."
+                data-tooltip="Kristologisk titel">Ordet</span>, och <span class="ann ann-titel" data-category="titel"
+                data-term="Ordet fanns hos Gud"
+                data-desc="En utsaga om Ordets pre-existens och relation till Gud — distinkt men oskiljaktigt."
+                data-tooltip="Kristologisk titel">Ordet fanns hos Gud, och Ordet var Gud</span>. Det fanns i begynnelsen
+            hos Gud. Allt blev till genom det, och utan det blev ingenting till av allt som finns till. I Ordet var liv,
+            och livet var <span class="ann ann-ljus" data-category="ljus" data-term="människornas ljus"
+                data-desc="Ljuset som metafor för gudomlig närvaro, sanning och liv. Här kopplas ljuset direkt till Logos — det är inte en egenskap utan en identitet."
+                data-tooltip="Ljus / mörker">människornas ljus</span>. Och <span class="ann ann-ljus"
+                data-category="ljus" data-term="ljuset lyser i mörkret"
+                data-desc="Det presens-formade 'lyser' antyder att det pågår — inte pågick. Mörkrets misslyckande att övervinna ljuset är textens första dramatiska utsaga."
+                data-tooltip="Ljus / mörker">ljuset lyser i mörkret, och mörkret har inte övervunnit det</span>.
+
+            Det kom en man som var sänd av Gud, hans namn var <span class="ann ann-vittne" data-category="vittne"
+                data-term="Johannes"
+                data-desc="Inte aposteln Johannes utan Johannes Döparen — evangeliets första vittne. Hans funktion är genomgående att peka bort från sig själv."
+                data-tooltip="Vittnesbörd">Johannes</span>. Han kom som ett <span class="ann ann-vittne"
+                data-category="vittne" data-term="vittne för att vittna om ljuset"
+                data-desc="Vittnesbördet är Johannes enda uppgift. Evangeliet understryker distinktionen hårt: han var inte ljuset, han pekade mot det."
+                data-tooltip="Vittnesbörd">vittne för att vittna om ljuset, så att alla skulle komma till tro genom
+                honom. Själv var han inte ljuset, men han skulle vittna om ljuset</span>.
+
+            Det <span class="ann ann-ljus" data-category="ljus" data-term="sanna ljuset"
+                data-desc="Kontrasten mot Johannes markeras: det finns ett 'sant' ljus — implikationen att allt annat ljus är ofullständigt eller härledd."
+                data-tooltip="Ljus / mörker">sanna ljuset, som ger alla människor ljus</span>, skulle komma in i
+            världen. Han var i världen, och världen hade blivit till genom honom, men <span class="ann ann-igan"
+                data-category="igan" data-term="världen kände honom inte"
+                data-desc="Igenkänningens paradox: skaparen är okänd för sin skapelse. Det grekiska 'ginōskō' — att känna, att ha erfarenhetsmässig kunskap — inte bara intellektuell igenkänning."
+                data-tooltip="Igenkänning">världen kände honom inte</span>. Han kom till det som var hans, och <span
+                class="ann ann-igan" data-category="igan" data-term="hans egna tog inte emot honom"
+                data-desc="Specifikt om Israel — 'hans egna' är ett ägandeuttryck. Icke-mottagandet skärper spänningen ytterligare inför vad som följer."
+                data-tooltip="Igenkänning">hans egna tog inte emot honom</span>. Men åt dem som tog emot honom gav han
+            rätten att bli Guds barn, åt alla som tror på hans namn, som har blivit födda inte av blod, inte av kroppens
+            vilja, inte av någon mans vilja, utan av Gud.
+
+            Och <span class="ann ann-titel" data-category="titel" data-term="Ordet blev människa"
+                data-desc="Inkarnationen — evangeliets teologiska tyngdpunkt. Det abstrakta Logos antar konkret mänsklig form. 'Bodde bland oss' är på grekiska 'skēnoō' — slog upp sitt tält, en referens till tabernaklet i öknen."
+                data-tooltip="Kristologisk titel">Ordet blev människa och bodde bland oss</span>, och vi såg hans
+            härlighet, en härlighet som den ende sonen får av sin fader, och han var fylld av nåd och sanning.
+
+            <span class="ann ann-vittne" data-category="vittne" data-term="Johannes vittnar om honom"
+                data-desc="Johannes vittnesbörd återkommer — evangelisten understryker vittnesrollen konsekvent. 'Ropar' är intensivt: det är ett offentligt, ihärdigt rop."
+                data-tooltip="Vittnesbörd">Johannes vittnar om honom och ropar</span>: »Det var om honom jag sade: Han
+            som kommer efter mig går före mig, ty han fanns före mig.« Av hans fullhet har vi alla fått del, med nåd och
+            åter nåd. Ty lagen gavs genom Mose, men nåden och sanningen har kommit genom <span class="ann ann-titel"
+                data-category="titel" data-term="Jesus Kristus"
+                data-desc="Första gången namnet Jesus Kristus nämns explicit i evangeliet. Kristus är inte ett efternamn utan en titel — den Smorde, det grekiska Messias."
+                data-tooltip="Kristologisk titel">Jesus Kristus</span>. Ingen har någonsin sett Gud. <span
+                class="ann ann-titel" data-category="titel" data-term="Den ende sonen, själv gud"
+                data-desc="En av Johannesevangeliets starkaste kristologiska utsagor. 'Monogenēs' — enfödd, unik — och 'alltid nära Fadern' antyder en evig, inte temporal, relation."
+                data-tooltip="Kristologisk titel">Den ende sonen, själv gud och alltid nära Fadern, han har förklarat
+                honom för oss</span>.
+
+            Och detta var <span class="ann ann-vittne" data-category="vittne" data-term="Johannes vittnesbörd"
+                data-desc="Nu skiftar texten till ett förhör — vittnesbördet prövas offentligt av religiösa auktoriteter. Johannes svar är en serie nekanden som renodlar hans vittnesroll."
+                data-tooltip="Vittnesbörd">Johannes vittnesbörd</span> när judarna i Jerusalem sände präster och leviter
+            för att fråga honom: »Vem är du?« Han bekände och förnekade inte, han bekände: »<span class="ann ann-vittne"
+                data-category="vittne" data-term="Jag är inte Messias"
+                data-desc="Tredubbelt förnekande: inte Messias, inte Elia, inte Profeten. Johannes identitet definieras genomgående negativt — han är den som inte är."
+                data-tooltip="Vittnesbörd">Jag är inte Messias</span>.« De frågade: »Vad är du då? Är du Elia?« Han
+            svarade: »Nej, det är jag inte.« – »Är du Profeten?« – »Nej«, svarade han. Då sade de: »Vem är du? Vi måste
+            ha ett svar åt dem som har skickat oss. Vad säger du om dig själv?« Han sade: »Jag är en röst som ropar i
+            öknen: Gör vägen rak för Herren, som profeten Jesaja har sagt.«
+
+            Johannes svarade: »Jag döper med vatten. Mitt ibland er står en som ni inte känner, han som kommer efter
+            mig. <span class="ann ann-vittne" data-category="vittne" data-term="Jag är inte värdig att knyta upp remmen"
+                data-desc="En slavmetafor — att knyta sandaler var en uppgift för den lägste slaven. Johannes placerar sig under all tänkbar social hierarki i relation till den som kommer."
+                data-tooltip="Vittnesbörd">Jag är inte värdig att knyta upp remmen på hans sandaler</span>.«
+
+            Nästa dag såg han Jesus komma, och han sade: »Där är <span class="ann ann-titel" data-category="titel"
+                data-term="Guds lamm"
+                data-desc="'Amnos tou theou' — Guds lamm. En komplex titel med rötter i påskalammet, offertraditioner och Jesajas lidande tjänare. Unikt för Johannesevangeliet."
+                data-tooltip="Kristologisk titel">Guds lamm som tar bort världens synd</span>.« Det är om honom jag har
+            sagt: Efter mig kommer en som går före mig, ty han fanns före mig. <span class="ann ann-igan"
+                data-category="igan" data-term="Jag kände honom inte"
+                data-desc="Paradoxalt: Johannes och Jesus var släktingar. 'Kände inte' syftar på den djupare igenkänningen — vem han verkligen är. Gudsuppenbarelsen kräver mer än bekantskap."
+                data-tooltip="Igenkänning">Jag kände honom inte</span>, men för att han skall bli sedd av Israel har jag
+            kommit och döper med vatten.« Och Johannes vittnade och sade: »<span class="ann ann-igan"
+                data-category="igan" data-term="Jag har sett Anden komma ner"
+                data-desc="Igenkänningens vändpunkt: det som Johannes inte visste avslöjas för honom genom ett tecken. Anden som duva — igenkänning sker uppifrån, inte inifrån."
+                data-tooltip="Igenkänning">Jag har sett Anden komma ner från himlen som en duva och stanna över
+                honom</span>. Jag kände honom inte, men han som sände mig att döpa med vatten sade till mig: 'Den som du
+            ser Anden komma ner och stanna över, han är den som döper med helig ande.' Jag har sett det, och jag har
+            vittnat om att han är <span class="ann ann-titel" data-category="titel" data-term="Guds utvalde"
+                data-desc="Vissa handskrifter läser 'Guds son' — en av textens intressanta varianter. 'Utvalde' knyter an till den israelitiske konungens utvalda status."
+                data-tooltip="Kristologisk titel">Guds utvalde</span>.«
+
+            Nästa dag stod Johannes där igen med två av sina lärjungar. När Jesus kom gående såg Johannes på honom och
+            sade: »Där är <span class="ann ann-titel" data-category="titel" data-term="Guds lamm"
+                data-desc="Titeln upprepas — men nu leder den till handling. De två lärjungarna följer efter Jesus direkt på ordet."
+                data-tooltip="Kristologisk titel">Guds lamm</span>.« De båda lärjungarna hörde vad han sade och följde
+            efter Jesus. Jesus vände sig om, och då han såg att de följde honom frågade han vad de ville. De svarade:
+            »Rabbi (det betyder mästare), var bor du?« Han sade: »Följ med och se!« De gick med honom och såg var han
+            bodde och stannade hos honom den dagen. Det var sent på eftermiddagen.
+
+            Andreas, Simon Petrus bror, var en av de två som hade hört Johannes ord och följt med Jesus. Han träffade
+            först sin bror, Simon, och sade till honom: »Vi har funnit <span class="ann ann-titel" data-category="titel"
+                data-term="Messias"
+                data-desc="Messias — hebreiska för 'den smorde'. Andreas igenkänning är omedelbar och total. Han springer direkt för att berätta."
+                data-tooltip="Kristologisk titel">Messias</span>« (det betyder Kristus). Han tog med honom till Jesus.
+            Jesus såg på Simon och sade: »Du är Simon, Johannes son. Du skall heta <span class="ann ann-igan"
+                data-category="igan" data-term="Kefas"
+                data-desc="Jesus byter namn på Simon — en djup igenkänningsakt. Att namnge någon är att känna dem. 'Kefas' (arameiska) / 'Petrus' (grekiska) — klippa."
+                data-tooltip="Igenkänning">Kefas</span>« (det betyder Petrus).
+
+            Filippos träffade Natanael och sade till honom: »Vi har funnit honom som det står om i Moses lag och hos
+            profeterna, Jesus, Josefs son, från Nasaret.« Natanael sade: »<span class="ann ann-igan"
+                data-category="igan" data-term="Kan det komma något gott från Nasaret?"
+                data-desc="Natanaels skepticism är geografisk — Nasaret nämns varken i GT eller rabbinsk litteratur som en betydelsefull plats. Igenkänning blockeras av förväntning."
+                data-tooltip="Igenkänning">Kan det komma något gott från Nasaret?</span>« Filippos svarade: »Följ med
+            och se!« Jesus såg Natanael komma och sade om honom: »Där är en sann israelit, en som är utan svek.«
+            Natanael frågade: »<span class="ann ann-igan" data-category="igan" data-term="Hur kan du känna mig?"
+                data-desc="Natanaels fråga är igenkänningens kärna: hur kan en främling känna mig? Svaret Jesus ger är det omöjligas bekräftelse."
+                data-tooltip="Igenkänning">Hur kan du känna mig?</span>« Jesus svarade: »<span class="ann ann-igan"
+                data-category="igan" data-term="Innan Filippos ropade på dig såg jag dig"
+                data-desc="Jesus igenkänning är pre-temporal — den föregår den fysiska mötet. Fikonträdet är ett gammaltestamentligt symbol för frid och kontemplation (1 Kung 4:25)."
+                data-tooltip="Igenkänning">Innan Filippos ropade på dig såg jag dig under fikonträdet</span>.« Natanael
+            svarade: »Rabbi, du är <span class="ann ann-titel" data-category="titel"
+                data-term="Guds son, Israels konung"
+                data-desc="Natanaels bekännelse innehåller två titlar: Guds son (gudomlig identitet) och Israels konung (messiansk politisk titel). Igenkänningen är fullständig och omedelbar."
+                data-tooltip="Kristologisk titel">Guds son, du är Israels konung</span>.« Då sade Jesus till honom: »Du
+            tror därför att jag sade att jag såg dig under fikonträdet. Större ting skall du få se.« Och han sade:
+            »Sannerligen, jag säger er: ni skall få se himlen öppen och Guds änglar stiga upp och stiga ner över <span
+                class="ann ann-titel" data-category="titel" data-term="Människosonen"
+                data-desc="'Människosonen' — den sista titeln i kapitlet. Hämtad ur Daniel 7 men omdefinierad av Jesus. Den enda titel Jesus konsekvent använder om sig själv i alla fyra evangelierna."
+                data-tooltip="Kristologisk titel">Människosonen</span>.«
+        </p>
+    </main>
+
+    <!-- Popup -->
+    <div id="popup-overlay">
+        <div id="popup">
+            <button id="popup-close">✕</button>
+            <div id="popup-category"></div>
+            <div id="popup-term"></div>
+            <div id="popup-desc"></div>
+            <button id="popup-btn">Utforska med AI →</button>
+        </div>
+    </div>
+
+    <script>
+        const categoryLabels = {
+            titel: { label: 'Kristologisk titel', color: '#7a2c2c' },
+            vittne: { label: 'Vittnesbörd', color: '#2c5c7a' },
+            ljus: { label: 'Ljus / mörker', color: '#5a7a2c' },
+            igan: { label: 'Igenkänning', color: '#6b2c7a' },
+        };
+
+        const masterPrompts = {
+            titel: `Du är en teolog och bibelvetare specialiserad på Johannesevangeliet och tidig kristologi. Användaren har klickat på en kristologisk titel i Johannes 1. Din uppgift är att utforska vad denna titel betyder — dess bakgrund i Gamla Testamentet och judisk tradition, hur Johannesevangeliet använder den, och vad den säger om Jesu identitet. Var djup men tillgänglig. Ställ gärna en följdfråga som fördjupar samtalet.`,
+            vittne: `Du är en bibelvetare med fokus på narratologi och retorisk analys av Johannesevangeliet. Användaren har klickat på ett vittnesbörd-tema i Johannes 1. Din uppgift är att utforska vittnesrollen — vad det innebär att vittna, hur Johannes Döparen definieras av vad han inte är, och vad texten säger om sanningens förmedling. Var analytisk och inbjudande till samtal.`,
+            ljus: `Du är en filosof och teolog med intresse för ljus-mörker-metaforik i antik och modern tanke. Användaren har klickat på ett ljus/mörker-tema i Johannes 1. Din uppgift är att utforska vad ljusmetaforen gör i denna text — filosofiskt, teologiskt och litterärt. Koppla gärna till platonism, gnosis, och modern teologi. Inbjud till fortsatt utforskning.`,
+            igan: `Du är en litteraturvetare och teolog med fokus på igenkänningens teologi i Johannesevangeliet. Användaren har klickat på ett igenkännings-tema i Johannes 1. Temat handlar om att känna och bli känd — vem som känner vem, hur igenkänning uppstår, och vad det kostar att inte kännas igen. Utforska textstället djupt och inbjud till samtal om vad igenkänning betyder.`,
+        };
+
+        const overlay = document.getElementById('popup-overlay');
+        const popupCategory = document.getElementById('popup-category');
+        const popupTerm = document.getElementById('popup-term');
+        const popupDesc = document.getElementById('popup-desc');
+        const popupBtn = document.getElementById('popup-btn');
+        const popupClose = document.getElementById('popup-close');
+
+        let currentData = null;
+
+        document.querySelectorAll('.ann').forEach(el => {
+            el.addEventListener('click', () => {
+                const cat = el.dataset.category;
+                const term = el.dataset.term;
+                const desc = el.dataset.desc;
+                const catInfo = categoryLabels[cat];
+
+                currentData = { cat, term, desc };
+
+                popupCategory.textContent = catInfo.label;
+                popupCategory.style.color = catInfo.color;
+                popupTerm.textContent = term;
+                popupDesc.textContent = desc;
+
+                overlay.classList.add('visible');
+            });
+        });
+
+        popupClose.addEventListener('click', () => overlay.classList.remove('visible'));
+        overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('visible'); });
+
+        popupBtn.addEventListener('click', () => {
+            if (!currentData) return;
+            const { cat, term, desc } = currentData;
+            const master = masterPrompts[cat];
+            const userMsg = `Jag läser Johannes 1 och klickade på frasen: "${term}"\n\nKontextuell beskrivning: ${desc}\n\nJag vill utforska detta djupare.`;
+
+            const url = buildChatUrl(master, userMsg);
+            window.open(url, '_blank');
+        });
+
+        function buildChatUrl(systemPrompt, userMessage) {
+            // Öppnar claude.ai med ett förberett meddelande
+            // I en riktig plugin-implementation skulle detta skickas via API
+            const encoded = encodeURIComponent(userMessage);
+            return `https://claude.ai/new?q=${encoded}`;
+        }
+    </script>
+</body>
+
+</html>

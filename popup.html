@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      width: 260px;
+      padding: 16px;
+      font-family: sans-serif;
+      font-size: 13px;
+    }
+
+    input {
+      width: 100%;
+      padding: 6px;
+      margin: 6px 0 10px;
+      box-sizing: border-box;
+    }
+
+    button {
+      width: 100%;
+      padding: 8px;
+      cursor: pointer;
+      margin-bottom: 6px;
+    }
+
+    #status {
+      color: green;
+      font-size: 12px;
+    }
+
+    #avancerat-panel {
+      display: none;
+      margin-top: 10px;
+      padding: 12px;
+      background: #f5f5f5;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+    }
+
+    #avancerat-panel label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #555;
+      margin-bottom: 4px;
+    }
+
+    #avancerat-panel select {
+      width: 100%;
+      padding: 5px;
+      margin-bottom: 12px;
+      font-size: 12px;
+      box-sizing: border-box;
+    }
+
+    #temp-rad {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    #temp-slider {
+      flex: 1;
+    }
+
+    #temp-värde {
+      width: 32px;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: right;
+    }
+
+    #temp-not {
+      font-size: 11px;
+      color: #888;
+      margin-bottom: 10px;
+    }
+
+    #avancerat-btn {
+      background: transparent;
+      border: 1px solid #ccc;
+      color: #555;
+      font-size: 12px;
+      padding: 5px;
+    }
+
+    #spara-avancerat {
+      font-size: 12px;
+      padding: 6px;
+      background: #333;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+
+<body>
+  <label>API-nyckel</label>
+  <input type="password" id="api-key" placeholder="sk-ant-..." />
+  <button id="save-btn">Spara nyckel</button>
+  <button id="annotate-btn">Annotera den här sidan</button>
+  <button id="avancerat-btn">Avancerat...</button>
+
+  <div id="avancerat-panel">
+    <label>Modell</label>
+    <select id="modell-val">
+      <option value="claude-opus-4-7">Opus 4.7 (kraftfullast)</option>
+      <option value="claude-sonnet-4-6">Sonnet 4.6 (balanserad)</option>
+      <option value="claude-haiku-4-5-20251001">Haiku 4.5 (snabbast)</option>
+    </select>
+
+    <label>Temperature</label>
+    <div id="temp-rad">
+      <input type="range" id="temp-slider" min="0" max="1" step="0.1" value="1">
+      <span id="temp-värde">1.0</span>
+    </div>
+    <div id="temp-not"></div>
+
+    <button id="spara-avancerat">Spara</button>
+  </div>
+
+  <div id="status"></div>
+  <script src="popup.js"></script>
+</body>
+
+</html>
