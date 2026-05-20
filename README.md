@@ -82,7 +82,9 @@ Du behöver ett konto hos [Anthropic](https://www.anthropic.com) och en aktiv AP
 
 ## Licens
 
-© 2026 Tomas Hultberg. Alla rättigheter förbehållna.
+© 2026 Tomas Hultberg.
+
+*Developed with the assistance of [Claude](https://claude.ai) by Anthropic.* Alla rättigheter förbehållna.
 
 Denna programvara får användas och distribueras fritt för privat, icke-kommersiellt bruk. Kommersiellt nyttjande — inklusive men inte begränsat till försäljning, licensiering, användning i kommersiella produkter eller tjänster samt användning i verksamhet i vinstsyfte — är förbjudet utan upphovsmannens uttryckliga skriftliga medgivande.
 
