@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rsvg-convert -w 16 -h 16 /Users/tomas/Python/browser_plugin/icon.svg -o /Users/tomas/Python/browser_plugin/icons/icon16.png)",
+      "Bash(rsvg-convert -w 48 -h 48 /Users/tomas/Python/browser_plugin/icon.svg -o /Users/tomas/Python/browser_plugin/icons/icon48.png)",
+      "Bash(rsvg-convert -w 128 -h 128 /Users/tomas/Python/browser_plugin/icon.svg -o /Users/tomas/Python/browser_plugin/icons/icon128.png)",
+      "Bash(git remote *)",
+      "Bash(git branch *)",
+      "Bash(git push *)",
+      "Bash(git add *)",
+      "Bash(git commit *)"
+    ]
+  }
+}

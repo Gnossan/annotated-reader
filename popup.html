@@ -103,29 +103,43 @@
 <body>
   <label>API-nyckel</label>
   <input type="password" id="api-key" placeholder="sk-ant-..." />
-  <button id="save-btn">Spara nyckel</button>
-  <button id="annotate-btn">Annotera den här sidan</button>
-  <button id="avancerat-btn">Avancerat...</button>
+  <button id="save-btn">Save key</button>
+  <button id="annotate-btn">Annotate this page</button>
+  <button id="avancerat-btn">Advanced...</button>
 
   <div id="avancerat-panel">
-    <label>Modell</label>
-    <select id="modell-val">
-      <option value="claude-opus-4-7">Opus 4.7 (kraftfullast)</option>
-      <option value="claude-sonnet-4-6">Sonnet 4.6 (balanserad)</option>
-      <option value="claude-haiku-4-5-20251001">Haiku 4.5 (snabbast)</option>
+    <label id="sprak-label">Language</label>
+    <select id="sprak-val" style="width:100%;padding:5px;margin-bottom:12px;font-size:12px;box-sizing:border-box;">
+      <option value="en">English (US)</option>
+      <option value="en-GB">English (UK)</option>
+      <option value="da">Dansk</option>
+      <option value="de">Deutsch</option>
+      <option value="es">Español</option>
+      <option value="fr">Français</option>
+      <option value="it">Italiano</option>
+      <option value="no">Norsk</option>
+      <option value="sv">Svenska</option>
     </select>
 
-    <label>Temperature</label>
+    <label id="modell-label">Model</label>
+    <select id="modell-val">
+      <option value="claude-opus-4-7">Opus 4.7 (most powerful)</option>
+      <option value="claude-sonnet-4-6">Sonnet 4.6 (balanced)</option>
+      <option value="claude-haiku-4-5-20251001">Haiku 4.5 (fastest)</option>
+    </select>
+
+    <label id="temp-label">Temperature</label>
     <div id="temp-rad">
       <input type="range" id="temp-slider" min="0" max="1" step="0.1" value="1">
       <span id="temp-värde">1.0</span>
     </div>
     <div id="temp-not"></div>
 
-    <button id="spara-avancerat">Spara</button>
+    <button id="spara-avancerat">Save</button>
   </div>
 
   <div id="status"></div>
+  <script src="locales.js"></script>
   <script src="popup.js"></script>
 </body>
 

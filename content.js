@@ -1,10 +1,217 @@
+(function () {
 let sammanfattning = "";
 let kategorier = [];
 let aktivChattIgång = false;
 let alleAnnoteringar = [];
+let källText = "";
 let annoteringIgnoreras = false;
 let annoteringTimeoutId = null;
-const AR_TIMEOUT_MS = 15000;
+const AR_TIMEOUT_MS = 30000;
+
+const AR_CONTENT = {
+    en: {
+        chatOmSidan:           "Chat about page",
+        redanAnnoterad:        "Page already annotated",
+        redanAnnoteradText:    "This will clear all annotations and chat history.",
+        annoteraOm:            "Re-annotate",
+        analyserar:            "Analyzing",
+        fel:               "✗ Error",
+        avbruten:          "✗ Cancelled",
+        klar:              "✓ Done",
+        exporteraChatt:    "↓ Export chat",
+        exporterar:        "⏳ Exporting...",
+        exporterad:        "✓ Exported",
+        lamnaSidan:        "Leave page?",
+        aktivaChattar:     "You have active chats — do you want to export the history before leaving?",
+        exporteraOchLamna: "Export and leave",
+        lamnaAnda:         "Leave anyway",
+        avbryt:            "Cancel",
+        utforskaAI:        "Explore with AI →",
+        annoterasom:       "Annotate as...",
+        anpassadKat:       "Custom category...",
+        anpassadKatRubrik: "Custom category",
+        kategorinamn:      "Category name",
+        valjFarg:          "Choose color",
+        annotera:          "Annotate",
+        analysenTarTid:    "Analysis is taking time",
+        textenLang:        (n) => `The text seems long (${n.toLocaleString("en-US")} characters). What would you like to do?`,
+        fortsattVanta:     "Keep waiting",
+        trunkeraForsok:    (k) => `Truncate (~${k}k characters) and try again`,
+        exportRubrik:      "Annotated Reader — Exported history",
+        exportDatum:       "Exported",
+        datumLocale:       "en-US",
+        exportKategori:    "Category",
+        exportBeskrivning: "Description",
+        exportDu:          "You",
+        exportIngenChatt:  "*No chat*",
+    },
+    "en-GB": {
+        chatOmSidan:           "Chat about page",
+        redanAnnoterad:        "Page already annotated",
+        redanAnnoteradText:    "This will clear all annotations and chat history.",
+        annoteraOm:            "Re-annotate",
+        analyserar:            "Analysing",
+        fel:               "✗ Error",
+        avbruten:          "✗ Cancelled",
+        klar:              "✓ Done",
+        exporteraChatt:    "↓ Export chat",
+        exporterar:        "⏳ Exporting...",
+        exporterad:        "✓ Exported",
+        lamnaSidan:        "Leave page?",
+        aktivaChattar:     "You have active chats — do you want to export the history before leaving?",
+        exporteraOchLamna: "Export and leave",
+        lamnaAnda:         "Leave anyway",
+        avbryt:            "Cancel",
+        utforskaAI:        "Explore with AI →",
+        annoterasom:       "Annotate as...",
+        anpassadKat:       "Custom category...",
+        anpassadKatRubrik: "Custom category",
+        kategorinamn:      "Category name",
+        valjFarg:          "Choose colour",
+        annotera:          "Annotate",
+        analysenTarTid:    "Analysis is taking time",
+        textenLang:        (n) => `The text seems long (${n.toLocaleString("en-GB")} characters). What would you like to do?`,
+        fortsattVanta:     "Keep waiting",
+        trunkeraForsok:    (k) => `Truncate (~${k}k characters) and try again`,
+        exportRubrik:      "Annotated Reader — Exported history",
+        exportDatum:       "Exported",
+        datumLocale:       "en-GB",
+        exportKategori:    "Category",
+        exportBeskrivning: "Description",
+        exportDu:          "You",
+        exportIngenChatt:  "*No chat*",
+    },
+    es: {
+        chatOmSidan: "Chat sobre la página", redanAnnoterad: "Página ya anotada",
+        redanAnnoteradText: "Esto eliminará todas las anotaciones e historial de chat.", annoteraOm: "Volver a anotar",
+        analyserar: "Analizando", fel: "✗ Error", avbruten: "✗ Cancelado", klar: "✓ Listo",
+        exporteraChatt: "↓ Exportar chat", exporterar: "⏳ Exportando...", exporterad: "✓ Exportado",
+        lamnaSidan: "¿Salir de la página?", aktivaChattar: "Tienes chats activos — ¿quieres exportar el historial antes de salir?",
+        exporteraOchLamna: "Exportar y salir", lamnaAnda: "Salir de todas formas", avbryt: "Cancelar",
+        utforskaAI: "Explorar con IA →", annoterasom: "Anotar como...", anpassadKat: "Categoría personalizada...",
+        anpassadKatRubrik: "Categoría personalizada", kategorinamn: "Nombre de categoría",
+        valjFarg: "Elegir color", annotera: "Anotar", analysenTarTid: "El análisis está tardando",
+        textenLang: (n) => `El texto parece largo (${n.toLocaleString("es-ES")} caracteres). ¿Qué deseas hacer?`,
+        fortsattVanta: "Seguir esperando", trunkeraForsok: (k) => `Truncar (~${k}k caracteres) y reintentar`,
+        exportRubrik: "Annotated Reader — Historial exportado", exportDatum: "Exportado", datumLocale: "es-ES",
+        exportKategori: "Categoría", exportBeskrivning: "Descripción", exportDu: "Tú", exportIngenChatt: "*Sin chat*",
+    },
+    fr: {
+        chatOmSidan: "Chat sur la page", redanAnnoterad: "Page déjà annotée",
+        redanAnnoteradText: "Cela effacera toutes les annotations et l'historique de chat.", annoteraOm: "Ré-annoter",
+        analyserar: "Analyse en cours", fel: "✗ Erreur", avbruten: "✗ Annulé", klar: "✓ Terminé",
+        exporteraChatt: "↓ Exporter le chat", exporterar: "⏳ Export en cours...", exporterad: "✓ Exporté",
+        lamnaSidan: "Quitter la page ?", aktivaChattar: "Vous avez des chats actifs — voulez-vous exporter l'historique avant de quitter ?",
+        exporteraOchLamna: "Exporter et quitter", lamnaAnda: "Quitter quand même", avbryt: "Annuler",
+        utforskaAI: "Explorer avec l'IA →", annoterasom: "Annoter comme...", anpassadKat: "Catégorie personnalisée...",
+        anpassadKatRubrik: "Catégorie personnalisée", kategorinamn: "Nom de catégorie",
+        valjFarg: "Choisir couleur", annotera: "Annoter", analysenTarTid: "L'analyse prend du temps",
+        textenLang: (n) => `Le texte semble long (${n.toLocaleString("fr-FR")} caractères). Que souhaitez-vous faire ?`,
+        fortsattVanta: "Continuer à attendre", trunkeraForsok: (k) => `Tronquer (~${k}k caractères) et réessayer`,
+        exportRubrik: "Annotated Reader — Historique exporté", exportDatum: "Exporté", datumLocale: "fr-FR",
+        exportKategori: "Catégorie", exportBeskrivning: "Description", exportDu: "Vous", exportIngenChatt: "*Pas de chat*",
+    },
+    de: {
+        chatOmSidan: "Chat über die Seite", redanAnnoterad: "Seite bereits annotiert",
+        redanAnnoteradText: "Alle Annotierungen und Chatverläufe werden gelöscht.", annoteraOm: "Erneut annotieren",
+        analyserar: "Analysiere", fel: "✗ Fehler", avbruten: "✗ Abgebrochen", klar: "✓ Fertig",
+        exporteraChatt: "↓ Chat exportieren", exporterar: "⏳ Exportiere...", exporterad: "✓ Exportiert",
+        lamnaSidan: "Seite verlassen?", aktivaChattar: "Sie haben aktive Chats — möchten Sie den Verlauf exportieren?",
+        exporteraOchLamna: "Exportieren und verlassen", lamnaAnda: "Trotzdem verlassen", avbryt: "Abbrechen",
+        utforskaAI: "Mit KI erkunden →", annoterasom: "Annotieren als...", anpassadKat: "Benutzerdefinierte Kategorie...",
+        anpassadKatRubrik: "Benutzerdefinierte Kategorie", kategorinamn: "Kategoriename",
+        valjFarg: "Farbe wählen", annotera: "Annotieren", analysenTarTid: "Die Analyse dauert",
+        textenLang: (n) => `Der Text scheint lang (${n.toLocaleString("de-DE")} Zeichen). Was möchten Sie tun?`,
+        fortsattVanta: "Weiter warten", trunkeraForsok: (k) => `Kürzen (~${k}k Zeichen) und erneut versuchen`,
+        exportRubrik: "Annotated Reader — Exportierter Verlauf", exportDatum: "Exportiert", datumLocale: "de-DE",
+        exportKategori: "Kategorie", exportBeskrivning: "Beschreibung", exportDu: "Sie", exportIngenChatt: "*Kein Chat*",
+    },
+    it: {
+        chatOmSidan: "Chat sulla pagina", redanAnnoterad: "Pagina già annotata",
+        redanAnnoteradText: "Verranno eliminate tutte le annotazioni e la cronologia chat.", annoteraOm: "Ri-annotare",
+        analyserar: "Analisi in corso", fel: "✗ Errore", avbruten: "✗ Annullato", klar: "✓ Fatto",
+        exporteraChatt: "↓ Esporta chat", exporterar: "⏳ Esportazione...", exporterad: "✓ Esportato",
+        lamnaSidan: "Lasciare la pagina?", aktivaChattar: "Hai chat attive — vuoi esportare la cronologia prima di uscire?",
+        exporteraOchLamna: "Esporta ed esci", lamnaAnda: "Esci comunque", avbryt: "Annulla",
+        utforskaAI: "Esplora con l'IA →", annoterasom: "Annota come...", anpassadKat: "Categoria personalizzata...",
+        anpassadKatRubrik: "Categoria personalizzata", kategorinamn: "Nome categoria",
+        valjFarg: "Scegli colore", annotera: "Annota", analysenTarTid: "L'analisi sta richiedendo tempo",
+        textenLang: (n) => `Il testo sembra lungo (${n.toLocaleString("it-IT")} caratteri). Cosa vuoi fare?`,
+        fortsattVanta: "Continua ad aspettare", trunkeraForsok: (k) => `Tronca (~${k}k caratteri) e riprova`,
+        exportRubrik: "Annotated Reader — Cronologia esportata", exportDatum: "Esportato", datumLocale: "it-IT",
+        exportKategori: "Categoria", exportBeskrivning: "Descrizione", exportDu: "Tu", exportIngenChatt: "*Nessuna chat*",
+    },
+    no: {
+        chatOmSidan: "Chat om siden", redanAnnoterad: "Siden er allerede annotert",
+        redanAnnoteradText: "Dette vil slette alle annoteringer og chat-historikk.", annoteraOm: "Annotér på nytt",
+        analyserar: "Analyserer", fel: "✗ Feil", avbruten: "✗ Avbrutt", klar: "✓ Ferdig",
+        exporteraChatt: "↓ Eksporter chat", exporterar: "⏳ Eksporterer...", exporterad: "✓ Eksportert",
+        lamnaSidan: "Forlate siden?", aktivaChattar: "Du har aktive chatter — vil du eksportere historikken?",
+        exporteraOchLamna: "Eksporter og forlat", lamnaAnda: "Forlat likevel", avbryt: "Avbryt",
+        utforskaAI: "Utforsk med AI →", annoterasom: "Annotér som...", anpassadKat: "Egendefinert kategori...",
+        anpassadKatRubrik: "Egendefinert kategori", kategorinamn: "Kategorinavn",
+        valjFarg: "Velg farge", annotera: "Annotér", analysenTarTid: "Analysen tar tid",
+        textenLang: (n) => `Teksten virker lang (${n.toLocaleString("nb-NO")} tegn). Hva vil du gjøre?`,
+        fortsattVanta: "Fortsett å vente", trunkeraForsok: (k) => `Forkort (~${k}k tegn) og prøv igjen`,
+        exportRubrik: "Annotated Reader — Eksportert historikk", exportDatum: "Eksportert", datumLocale: "nb-NO",
+        exportKategori: "Kategori", exportBeskrivning: "Beskrivelse", exportDu: "Du", exportIngenChatt: "*Ingen chat*",
+    },
+    da: {
+        chatOmSidan: "Chat om siden", redanAnnoterad: "Siden er allerede annoteret",
+        redanAnnoteradText: "Dette vil slette alle annoteringer og chathistorik.", annoteraOm: "Annotér igen",
+        analyserar: "Analyserer", fel: "✗ Fejl", avbruten: "✗ Afbrudt", klar: "✓ Færdig",
+        exporteraChatt: "↓ Eksportér chat", exporterar: "⏳ Eksporterer...", exporterad: "✓ Eksporteret",
+        lamnaSidan: "Forlad siden?", aktivaChattar: "Du har aktive chats — vil du eksportere historikken?",
+        exporteraOchLamna: "Eksportér og forlad", lamnaAnda: "Forlad alligevel", avbryt: "Annullér",
+        utforskaAI: "Udforsk med AI →", annoterasom: "Annotér som...", anpassadKat: "Brugerdefineret kategori...",
+        anpassadKatRubrik: "Brugerdefineret kategori", kategorinamn: "Kategorinavn",
+        valjFarg: "Vælg farve", annotera: "Annotér", analysenTarTid: "Analysen tager tid",
+        textenLang: (n) => `Teksten virker lang (${n.toLocaleString("da-DK")} tegn). Hvad vil du gøre?`,
+        fortsattVanta: "Fortsæt med at vente", trunkeraForsok: (k) => `Afkort (~${k}k tegn) og prøv igen`,
+        exportRubrik: "Annotated Reader — Eksporteret historik", exportDatum: "Eksporteret", datumLocale: "da-DK",
+        exportKategori: "Kategori", exportBeskrivning: "Beskrivelse", exportDu: "Du", exportIngenChatt: "*Ingen chat*",
+    },
+    sv: {
+        chatOmSidan:           "Chatta om sidan",
+        redanAnnoterad:        "Sidan är redan annoterad",
+        redanAnnoteradText:    "Detta rensar alla annoteringar och chatthistorik.",
+        annoteraOm:            "Annotera om",
+        analyserar:            "Analyserar",
+        fel:               "✗ Fel",
+        avbruten:          "✗ Avbruten",
+        klar:              "✓ Klar",
+        exporteraChatt:    "↓ Exportera chatt",
+        exporterar:        "⏳ Exporterar...",
+        exporterad:        "✓ Exporterad",
+        lamnaSidan:        "Lämna sidan?",
+        aktivaChattar:     "Du har aktiva chattar — vill du exportera historiken innan du lämnar?",
+        exporteraOchLamna: "Exportera och lämna",
+        lamnaAnda:         "Lämna ändå",
+        avbryt:            "Avbryt",
+        utforskaAI:        "Utforska med AI →",
+        annoterasom:       "Annotera som...",
+        anpassadKat:       "Anpassad kategori...",
+        anpassadKatRubrik: "Anpassad kategori",
+        kategorinamn:      "Kategorinamn",
+        valjFarg:          "Välj färg",
+        annotera:          "Annotera",
+        analysenTarTid:    "Analysen tar tid",
+        textenLang:        (n) => `Texten verkar vara lång (${n.toLocaleString("sv-SE")} tecken). Vad vill du göra?`,
+        fortsattVanta:     "Fortsätt vänta",
+        trunkeraForsok:    (k) => `Trunkera (~${k}k tecken) och försök igen`,
+        exportRubrik:      "Annotated Reader — Exporterad historik",
+        exportDatum:       "Exporterad",
+        datumLocale:       "sv-SE",
+        exportKategori:    "Kategori",
+        exportBeskrivning: "Beskrivning",
+        exportDu:          "Du",
+        exportIngenChatt:  "*Ingen chatt*",
+    }
+};
+
+let t = AR_CONTENT.en;
+
+// Dessa hanteras av locales.js i HTML-sidor men behövs inline i content.js
 
 if (document.getElementById("ar-overlay")) {
     console.log("Redan igång");
@@ -19,6 +226,8 @@ if (!document.getElementById("ar-stil")) {
         .ar-punkt { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: #f5f0e8; animation: ar-puls 1.4s infinite ease-in-out; margin: 0 2px; vertical-align: middle; }
         .ar-punkt:nth-child(2) { animation-delay: 0.2s; }
         .ar-punkt:nth-child(3) { animation-delay: 0.4s; }
+        .ar-markering { background-color: rgba(var(--ar-r), var(--ar-g), var(--ar-b), 0.3) !important; }
+        .ar-markering:hover { background-color: rgba(var(--ar-r), var(--ar-g), var(--ar-b), 0.7) !important; }
     `;
     document.head.appendChild(stil);
 }
@@ -40,8 +249,8 @@ async function exporteraHistorik() {
 
     if (annoteringar.length === 0 && Object.keys(chattar).length === 0) return;
 
-    let md = "# Annotated Reader — Exporterad historik\n\n";
-    md += `Exporterad: ${new Date().toLocaleString("sv-SE")}\n\n`;
+    let md = `# ${t.exportRubrik}\n\n`;
+    md += `${t.exportDatum}: ${new Date().toLocaleString(t.datumLocale)}\n\n`;
 
     const hanterade = new Set();
 
@@ -51,18 +260,18 @@ async function exporteraHistorik() {
         const sess = chattar[id];
 
         md += `## ${ann.text}\n`;
-        md += `**Kategori:** ${ann.kategori}  \n`;
-        md += `**Beskrivning:** ${ann.beskrivning}\n\n`;
+        md += `**${t.exportKategori}:** ${ann.kategori}  \n`;
+        md += `**${t.exportBeskrivning}:** ${ann.beskrivning}\n\n`;
 
         if (sess?.historik?.length > 0) {
             for (const msg of sess.historik) {
                 if (msg.silent) continue;
-                const roll = msg.role === "user" ? "**Du**" : "**AI**";
+                const roll = msg.role === "user" ? `**${t.exportDu}**` : "**AI**";
                 const text = typeof msg.content === "string" ? msg.content : msg.content[0]?.text || "";
                 md += `${roll}: ${text}\n\n`;
             }
         } else {
-            md += `*Ingen chatt*\n\n`;
+            md += `${t.exportIngenChatt}\n\n`;
         }
         md += "---\n\n";
     }
@@ -70,11 +279,11 @@ async function exporteraHistorik() {
     for (const [id, sess] of Object.entries(chattar)) {
         if (hanterade.has(id) || !sess.historik?.length) continue;
         md += `## ${sess.fras}\n`;
-        md += `**Kategori:** ${sess.kategori}  \n`;
-        md += `**Beskrivning:** ${sess.beskrivning}\n\n`;
+        md += `**${t.exportKategori}:** ${sess.kategori}  \n`;
+        md += `**${t.exportBeskrivning}:** ${sess.beskrivning}\n\n`;
         for (const msg of sess.historik) {
             if (msg.silent) continue;
-            const roll = msg.role === "user" ? "**Du**" : "**AI**";
+            const roll = msg.role === "user" ? `**${t.exportDu}**` : "**AI**";
             const text = typeof msg.content === "string" ? msg.content : msg.content[0]?.text || "";
             md += `${roll}: ${text}\n\n`;
         }
@@ -106,12 +315,12 @@ function visaExportDialog(fortsätt) {
     `;
     dialog.innerHTML = `
         <div style="background:#1a1610;color:#f5f0e8;padding:24px;border-radius:10px;max-width:360px;width:90%;font-family:sans-serif;box-shadow:0 8px 32px rgba(0,0,0,0.6);">
-            <div style="font-size:15px;font-weight:600;margin-bottom:8px;">Lämna sidan?</div>
-            <div style="font-size:13px;opacity:0.8;margin-bottom:20px;line-height:1.5;">Du har aktiva chattar — vill du exportera historiken innan du lämnar?</div>
+            <div style="font-size:15px;font-weight:600;margin-bottom:8px;">${t.lamnaSidan}</div>
+            <div style="font-size:13px;opacity:0.8;margin-bottom:20px;line-height:1.5;">${t.aktivaChattar}</div>
             <div style="display:flex;flex-direction:column;gap:8px;">
-                <button id="ar-exp-exportera" style="padding:10px;background:#f0c040;color:#1a1610;border:none;border-radius:6px;cursor:pointer;font-weight:600;font-size:13px;">Exportera och lämna</button>
-                <button id="ar-exp-lämna" style="padding:10px;background:#333;color:#f5f0e8;border:none;border-radius:6px;cursor:pointer;font-size:13px;">Lämna ändå</button>
-                <button id="ar-exp-avbryt" style="padding:10px;background:transparent;color:#f5f0e8;border:1px solid #444;border-radius:6px;cursor:pointer;font-size:13px;">Avbryt</button>
+                <button id="ar-exp-exportera" style="padding:10px;background:#f0c040;color:#1a1610;border:none;border-radius:6px;cursor:pointer;font-weight:600;font-size:13px;">${t.exporteraOchLamna}</button>
+                <button id="ar-exp-lämna" style="padding:10px;background:#333;color:#f5f0e8;border:none;border-radius:6px;cursor:pointer;font-size:13px;">${t.lamnaAnda}</button>
+                <button id="ar-exp-avbryt" style="padding:10px;background:transparent;color:#f5f0e8;border:1px solid #444;border-radius:6px;cursor:pointer;font-size:13px;">${t.avbryt}</button>
             </div>
         </div>
     `;
@@ -164,7 +373,7 @@ function visaKategoriMeny(x, y, text, range) {
     `;
 
     meny.innerHTML = `
-        <div style="padding:8px 12px;font-size:11px;opacity:0.5;border-bottom:1px solid #333;text-transform:uppercase;letter-spacing:0.06em;">Annotera som...</div>
+        <div style="padding:8px 12px;font-size:11px;opacity:0.5;border-bottom:1px solid #333;text-transform:uppercase;letter-spacing:0.06em;">${t.annoterasom}</div>
         ${kategorier.map(k => `
             <div class="ar-meny-val" data-namn="${k.namn}" data-farg="${k.farg}" data-beskrivning="${k.beskrivning}"
                  style="padding:9px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;">
@@ -174,7 +383,7 @@ function visaKategoriMeny(x, y, text, range) {
         `).join("")}
         <div id="ar-anpassad-val" style="padding:9px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;border-top:1px solid #333;opacity:0.7;">
             <div style="width:10px;height:10px;border-radius:2px;border:1px dashed #888;flex-shrink:0;"></div>
-            <span>Anpassad kategori...</span>
+            <span>${t.anpassadKat}</span>
         </div>
     `;
 
@@ -197,9 +406,9 @@ function visaKategoriMeny(x, y, text, range) {
     document.getElementById("ar-anpassad-val").addEventListener("click", (e) => {
         e.stopPropagation();
         meny.innerHTML = `
-            <div style="padding:10px 12px;font-size:11px;opacity:0.5;border-bottom:1px solid #333;text-transform:uppercase;letter-spacing:0.06em;">Anpassad kategori</div>
+            <div style="padding:10px 12px;font-size:11px;opacity:0.5;border-bottom:1px solid #333;text-transform:uppercase;letter-spacing:0.06em;">${t.anpassadKatRubrik}</div>
             <div style="padding:10px 12px;display:flex;flex-direction:column;gap:8px;">
-                <input id="ar-kust-namn" type="text" placeholder="Kategorinamn" style="
+                <input id="ar-kust-namn" type="text" placeholder="${t.kategorinamn}" style="
                     background:#2a2218;border:1px solid #444;border-radius:4px;
                     color:#f5f0e8;padding:6px 8px;font-size:12px;outline:none;width:100%;
                 ">
@@ -208,12 +417,12 @@ function visaKategoriMeny(x, y, text, range) {
                         width:32px;height:28px;border:1px solid #444;border-radius:4px;
                         background:none;cursor:pointer;padding:2px;
                     ">
-                    <span style="font-size:11px;opacity:0.6;">Välj färg</span>
+                    <span style="font-size:11px;opacity:0.6;">${t.valjFarg}</span>
                 </div>
                 <button id="ar-kust-ok" style="
                     padding:7px;background:#f0c040;color:#1a1610;border:none;
                     border-radius:4px;cursor:pointer;font-weight:600;font-size:12px;
-                ">Annotera</button>
+                ">${t.annotera}</button>
             </div>
         `;
 
@@ -300,20 +509,51 @@ window.addEventListener("beforeunload", (e) => {
     e.returnValue = "";
 });
 
-function visaExportKnapp() {
-    const gammal = document.getElementById("ar-export-knapp");
+function görDragBar(knapp) {
+    let dragging = false, startX, startY, origTop, origRight;
+    knapp.style.cursor = "grab";
+    knapp.addEventListener("mousedown", (e) => {
+        dragging = false;
+        startX = e.clientX;
+        startY = e.clientY;
+        const rect = knapp.getBoundingClientRect();
+        origTop   = rect.top;
+        origRight = window.innerWidth - rect.right;
+        knapp.style.cursor = "grabbing";
+
+        const onMove = (e) => {
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+            if (!dragging && Math.abs(dx) + Math.abs(dy) > 4) dragging = true;
+            if (!dragging) return;
+            knapp.style.top   = `${Math.max(0, origTop + dy)}px`;
+            knapp.style.right = `${Math.max(0, origRight - dx)}px`;
+        };
+        const onUp = () => {
+            knapp.style.cursor = "grab";
+            document.removeEventListener("mousemove", onMove);
+            document.removeEventListener("mouseup", onUp);
+        };
+        document.addEventListener("mousemove", onMove);
+        document.addEventListener("mouseup", onUp);
+    });
+    return () => dragging;
+}
+
+function visaHelTextKnapp() {
+    const gammal = document.getElementById("ar-heltext-knapp");
     if (gammal) return;
 
     const knapp = document.createElement("button");
-    knapp.id = "ar-export-knapp";
-    knapp.textContent = "↓ Exportera chatt";
+    knapp.id = "ar-heltext-knapp";
+    knapp.textContent = t.chatOmSidan;
     knapp.style.cssText = `
         position: fixed;
-        bottom: 20px;
+        top: 20px;
         right: 20px;
         background: #1a1610;
-        color: #f5f0e8;
-        border: 1px solid #444;
+        color: #f0c040;
+        border: 1px solid #f0c040;
         border-radius: 6px;
         padding: 8px 14px;
         font-family: sans-serif;
@@ -325,13 +565,69 @@ function visaExportKnapp() {
     `;
     knapp.addEventListener("mouseenter", () => knapp.style.opacity = "1");
     knapp.addEventListener("mouseleave", () => knapp.style.opacity = "0.85");
-    knapp.addEventListener("click", async () => {
-        knapp.textContent = "⏳ Exporterar...";
-        await exporteraHistorik();
-        knapp.textContent = "✓ Exporterad";
-        setTimeout(() => { knapp.textContent = "↓ Exportera chatt"; }, 2000);
+
+    const isDragging = görDragBar(knapp);
+
+    knapp.addEventListener("click", () => {
+        if (isDragging()) return;
+        if (!aktivChattIgång) {
+            aktivChattIgång = true;
+            visaExportKnapp();
+        }
+        chrome.runtime.sendMessage({
+            type: "OPEN_SIDEPANEL",
+            fras: null,
+            markeringId: "ar_chat_hela_sidan",
+            helText: källText,
+            kategori: "",
+            beskrivning: "",
+            sammanfattning: sammanfattning,
+            kategorier: kategorier
+        });
     });
     document.body.appendChild(knapp);
+}
+
+function visaExportKnapp() {
+    const gammal = document.getElementById("ar-export-knapp");
+    if (gammal) return;
+
+    const knapp = document.createElement("button");
+    knapp.id = "ar-export-knapp";
+    knapp.textContent = t.exporteraChatt;
+    knapp.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #1a1610;
+        color: #f0c040;
+        border: 1px solid #f0c040;
+        border-radius: 6px;
+        padding: 8px 14px;
+        font-family: sans-serif;
+        font-size: 12px;
+        z-index: 9998;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        opacity: 0.85;
+    `;
+    knapp.addEventListener("mouseenter", () => knapp.style.opacity = "1");
+    knapp.addEventListener("mouseleave", () => knapp.style.opacity = "0.85");
+    document.body.appendChild(knapp);
+
+    const isExportDragging = görDragBar(knapp);
+
+    // Konvertera bottom/right till top/right efter att knappen lagts till i DOM
+    const rect = knapp.getBoundingClientRect();
+    knapp.style.bottom = "";
+    knapp.style.top = `${rect.top}px`;
+
+    knapp.addEventListener("click", async () => {
+        if (isExportDragging()) return;
+        knapp.textContent = t.exporterar;
+        await exporteraHistorik();
+        knapp.textContent = t.exporterad;
+        setTimeout(() => { knapp.textContent = t.exporteraChatt; }, 2000);
+    });
 }
 
 function visaPopup(x, y, text, kategori, beskrivning, markeringId) {
@@ -360,7 +656,7 @@ function visaPopup(x, y, text, kategori, beskrivning, markeringId) {
         <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;opacity:0.6;margin-bottom:6px;">${kategori.replace("_", " ")}</div>
         <div style="font-weight:500;margin-bottom:8px;">${text}</div>
         <div style="opacity:0.85;margin-bottom:12px;">${beskrivning}</div>
-        <button id="ar-utforska" style="width:100%;padding:7px;background:#f0c040;color:#1a1610;border:none;border-radius:4px;cursor:pointer;font-weight:600;font-size:12px;">Utforska med AI →</button>
+        <button id="ar-utforska" style="width:100%;padding:7px;background:#f0c040;color:#1a1610;border:none;border-radius:4px;cursor:pointer;font-weight:600;font-size:12px;">${t.utforskaAI}</button>
     `;
 
     document.body.appendChild(popup);
@@ -373,6 +669,7 @@ function visaPopup(x, y, text, kategori, beskrivning, markeringId) {
 
     document.getElementById("ar-utforska").addEventListener("click", (e) => {
         e.stopPropagation();
+        popup.remove();
         if (!aktivChattIgång) {
             aktivChattIgång = true;
             visaExportKnapp();
@@ -408,7 +705,11 @@ function markeraFras(text, kategori, beskrivning, kategorifarger) {
         const span = document.createElement("span");
         span.textContent = normText;
         span.dataset.markeringId = markeringId;
-        span.style.backgroundColor = kategorifarger[kategori] || "#ccc";
+        span.className = "ar-markering";
+        const hex = (kategorifarger[kategori] || "#cccccc").replace("#", "");
+        span.style.setProperty("--ar-r", parseInt(hex.slice(0, 2), 16));
+        span.style.setProperty("--ar-g", parseInt(hex.slice(2, 4), 16));
+        span.style.setProperty("--ar-b", parseInt(hex.slice(4, 6), 16));
         span.style.cursor = "pointer";
         span.title = beskrivning;
         span.addEventListener("click", (e) => {
@@ -445,7 +746,7 @@ document.documentElement.appendChild(overlay);
 
 function visaOverlayAnalyserar(sekunder) {
     overlay.innerHTML = `
-        <span>Analyserar</span>
+        <span>${t.analyserar}</span>
         <span class="ar-punkt"></span><span class="ar-punkt"></span><span class="ar-punkt"></span>
         ${sekunder > 0 ? `<span style="opacity:0.5;font-size:12px;">(${sekunder}s)</span>` : ""}
     `;
@@ -467,14 +768,14 @@ function visaTimeoutDialog(originalText) {
     `;
     dialog.innerHTML = `
         <div style="background:#1a1610;color:#f5f0e8;padding:24px;border-radius:10px;max-width:360px;width:90%;font-family:sans-serif;box-shadow:0 8px 32px rgba(0,0,0,0.6);">
-            <div style="font-size:15px;font-weight:600;margin-bottom:8px;">Analysen tar tid</div>
+            <div style="font-size:15px;font-weight:600;margin-bottom:8px;">${t.analysenTarTid}</div>
             <div style="font-size:13px;opacity:0.8;margin-bottom:20px;line-height:1.5;">
-                Texten verkar vara lång (${originalText.length.toLocaleString("sv-SE")} tecken). Vad vill du göra?
+                ${t.textenLang(originalText.length)}
             </div>
             <div style="display:flex;flex-direction:column;gap:8px;">
-                <button id="ar-to-vänta" style="padding:10px;background:#2a2218;color:#f5f0e8;border:1px solid #444;border-radius:6px;cursor:pointer;font-size:13px;">Fortsätt vänta</button>
-                <button id="ar-to-trunkera" style="padding:10px;background:#f0c040;color:#1a1610;border:none;border-radius:6px;cursor:pointer;font-weight:600;font-size:13px;">Trunkera (~${Math.round(trunkLängd / 1000)}k tecken) och försök igen</button>
-                <button id="ar-to-avbryt" style="padding:10px;background:transparent;color:#f5f0e8;border:1px solid #444;border-radius:6px;cursor:pointer;font-size:13px;">Avbryt</button>
+                <button id="ar-to-vänta" style="padding:10px;background:#2a2218;color:#f5f0e8;border:1px solid #444;border-radius:6px;cursor:pointer;font-size:13px;">${t.fortsattVanta}</button>
+                <button id="ar-to-trunkera" style="padding:10px;background:#f0c040;color:#1a1610;border:none;border-radius:6px;cursor:pointer;font-weight:600;font-size:13px;">${t.trunkeraForsok(Math.round(trunkLängd / 1000))}</button>
+                <button id="ar-to-avbryt" style="padding:10px;background:transparent;color:#f5f0e8;border:1px solid #444;border-radius:6px;cursor:pointer;font-size:13px;">${t.avbryt}</button>
             </div>
         </div>
     `;
@@ -494,7 +795,7 @@ function visaTimeoutDialog(originalText) {
     document.getElementById("ar-to-avbryt").addEventListener("click", () => {
         annoteringIgnoreras = true;
         dialog.remove();
-        overlay.textContent = "✗ Avbruten";
+        overlay.textContent = t.avbruten;
         setTimeout(() => overlay.remove(), 2000);
     });
 }
@@ -522,7 +823,7 @@ function startAnnotering(text) {
 
             if (!response?.result?.content?.[0]?.text) {
                 console.log("Inget svar att rita");
-                overlay.textContent = "✗ Fel";
+                overlay.textContent = t.fel;
                 setTimeout(() => overlay.remove(), 2000);
                 return;
             }
@@ -546,6 +847,7 @@ function startAnnotering(text) {
 
             sammanfattning = data.sammanfattning || "";
             kategorier = data.kategorier || [];
+            källText = text;
 
             data.annoteringar
                 .sort((a, b) => b.text.length - a.text.length)
@@ -555,11 +857,70 @@ function startAnnotering(text) {
                 });
             chrome.storage.session.set({ ar_annoteringar: alleAnnoteringar });
 
-            overlay.textContent = "✓ Klar";
-            setTimeout(() => overlay.remove(), 2000);
+            overlay.textContent = t.klar;
+            setTimeout(() => {
+                overlay.remove();
+                visaHelTextKnapp();
+            }, 2000);
         }
     );
 }
 
+function rensaAnnoteringar() {
+    document.querySelectorAll(".ar-markering").forEach(span => {
+        span.replaceWith(document.createTextNode(span.textContent));
+    });
+    document.getElementById("ar-heltext-knapp")?.remove();
+    document.getElementById("ar-export-knapp")?.remove();
+    alleAnnoteringar = [];
+    aktivChattIgång = false;
+    sammanfattning = "";
+    kategorier = [];
+    källText = "";
+    chrome.storage.session.clear();
+}
+
+function visaOmAnnoteraDialog(bekräfta) {
+    const dialog = document.createElement("div");
+    dialog.style.cssText = `
+        position: fixed; inset: 0;
+        background: rgba(0,0,0,0.6);
+        z-index: 99999;
+        display: flex; align-items: center; justify-content: center;
+    `;
+    dialog.innerHTML = `
+        <div style="background:#1a1610;color:#f5f0e8;padding:24px;border-radius:10px;max-width:360px;width:90%;font-family:sans-serif;box-shadow:0 8px 32px rgba(0,0,0,0.6);">
+            <div style="font-size:15px;font-weight:600;margin-bottom:8px;">${t.redanAnnoterad}</div>
+            <div style="font-size:13px;opacity:0.8;margin-bottom:20px;line-height:1.5;">${t.redanAnnoteradText}</div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+                <button id="ar-om-ja" style="padding:10px;background:#f0c040;color:#1a1610;border:none;border-radius:6px;cursor:pointer;font-weight:600;font-size:13px;">${t.annoteraOm}</button>
+                <button id="ar-om-nej" style="padding:10px;background:transparent;color:#f5f0e8;border:1px solid #444;border-radius:6px;cursor:pointer;font-size:13px;">${t.avbryt}</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(dialog);
+
+    document.getElementById("ar-om-ja").addEventListener("click", () => {
+        dialog.remove();
+        bekräfta();
+    });
+    document.getElementById("ar-om-nej").addEventListener("click", () => {
+        dialog.remove();
+        overlay.remove();
+    });
+}
+
 const källelement = document.getElementById("main-text") || document.body;
-startAnnotering(källelement.innerText);
+chrome.storage.local.get("lang", ({ lang = "en" }) => {
+    t = AR_CONTENT[lang] || AR_CONTENT.en;
+    if (document.querySelector(".ar-markering")) {
+        visaOmAnnoteraDialog(() => {
+            rensaAnnoteringar();
+            startAnnotering(källelement.innerText);
+        });
+    } else {
+        startAnnotering(källelement.innerText);
+    }
+});
+
+})(); // IIFE slut

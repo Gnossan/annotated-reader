@@ -2,28 +2,54 @@ let historik = [];
 let systemprompt = "";
 let nuvarandeMarkeringId = null;
 let nuvarandeMeta = {};
+let t = AR_LOCALES.en;
+
+chrome.storage.local.get(["lang", "tema"], ({ lang = "en", tema = "mörkt" }) => {
+    t = AR_LOCALES[lang] || AR_LOCALES.en;
+    document.getElementById("header-text").textContent  = t.header;
+    document.getElementById("exportera").textContent    = t.exportera;
+    document.getElementById("input").placeholder        = t.stallEnFraga;
+    tillampaTemat(tema);
+});
+
+function tillampaTemat(tema) {
+    const ljust = tema === "ljust";
+    document.body.classList.toggle("ljust", ljust);
+    document.getElementById("tema-knapp").textContent = ljust ? "🌙" : "☀";
+}
+
+document.getElementById("tema-knapp").addEventListener("click", () => {
+    const ljust = document.body.classList.toggle("ljust");
+    const tema = ljust ? "ljust" : "mörkt";
+    document.getElementById("tema-knapp").textContent = ljust ? "🌙" : "☀";
+    chrome.storage.local.set({ tema });
+});
 
 chrome.runtime.onMessage.addListener((message) => {
     if (message.type !== "OPEN_PANEL") return;
 
-    document.getElementById("sp-kategori").textContent = message.kategori.replace("_", " ");
-    document.getElementById("sp-fras").textContent = message.fras;
-    document.getElementById("sp-beskrivning").textContent = message.beskrivning;
-    document.getElementById("sp-sammanfattning").textContent = message.sammanfattning || "";
-
     nuvarandeMarkeringId = message.markeringId;
-    nuvarandeMeta = {
-        fras: message.fras,
-        kategori: message.kategori,
-        beskrivning: message.beskrivning,
-        sammanfattning: message.sammanfattning || ""
-    };
 
-    systemprompt = `Du är en hjälpsam guide för text som användaren läser.
-Texten handlar om: ${message.sammanfattning}
-Användaren har markerat frasen "${message.fras}" i kategorin "${message.kategori}".
-Beskrivning: ${message.beskrivning}
-Hjälp användaren utforska och förstå denna fras i sitt sammanhang.`;
+    if (message.helText) {
+        document.getElementById("sp-kategori").textContent = "";
+        document.getElementById("sp-fras").textContent = t.chatOmSidan || "Chat about page";
+        document.getElementById("sp-beskrivning").textContent = message.sammanfattning || "";
+        document.getElementById("sp-sammanfattning").textContent = "";
+        nuvarandeMeta = { fras: t.chatOmSidan, kategori: "", beskrivning: "", sammanfattning: message.sammanfattning || "" };
+        systemprompt = t.helTextSystemPrompt(message.helText, message.sammanfattning);
+    } else {
+        document.getElementById("sp-kategori").textContent = message.kategori.replace("_", " ");
+        document.getElementById("sp-fras").textContent = message.fras;
+        document.getElementById("sp-beskrivning").textContent = message.beskrivning;
+        document.getElementById("sp-sammanfattning").textContent = message.sammanfattning || "";
+        nuvarandeMeta = {
+            fras: message.fras,
+            kategori: message.kategori,
+            beskrivning: message.beskrivning,
+            sammanfattning: message.sammanfattning || ""
+        };
+        systemprompt = t.systemPrompt(message.fras, message.kategori, message.beskrivning, message.sammanfattning);
+    }
 
     const meddelandenEl = document.getElementById("meddelanden");
     meddelandenEl.innerHTML = "";
@@ -82,17 +108,17 @@ document.getElementById("korsreferera").addEventListener("click", async () => {
     `;
 
     if (andra.length === 0) {
-        panel.innerHTML = `<div style="opacity:0.6;font-size:12px;padding:4px 0;">Inga andra markeringar med historik.</div>`;
+        panel.innerHTML = `<div style="opacity:0.6;font-size:12px;padding:4px 0;">${t.ingaAndra}</div>`;
         document.getElementById("input-area").insertAdjacentElement("beforebegin", panel);
         setTimeout(() => panel.remove(), 2000);
         return;
     }
 
-    panel.innerHTML = `<div style="opacity:0.6;margin-bottom:6px;font-size:11px;text-transform:uppercase;letter-spacing:0.06em;">Välj markering att korsreferera</div>` +
+    panel.innerHTML = `<div style="opacity:0.6;margin-bottom:6px;font-size:11px;text-transform:uppercase;letter-spacing:0.06em;">${t.valjMarkering}</div>` +
         andra.map(([k, v]) => `
             <div class="ar-korsref-item" data-key="${k}" style="padding:6px 8px;border-radius:4px;cursor:pointer;margin-bottom:4px;border:1px solid #333;">
                 <span style="font-weight:600;">${v.fras}</span>
-                <span style="opacity:0.6;"> — ${v.historik.length} meddelanden</span>
+                <span style="opacity:0.6;"> — ${v.historik.length} ${t.meddelandenSuffix}</span>
             </div>
         `).join("");
     document.getElementById("input-area").insertAdjacentElement("beforebegin", panel);
@@ -119,8 +145,8 @@ document.getElementById("exportera").addEventListener("click", async () => {
 
     if (annoteringar.length === 0 && Object.keys(chattar).length === 0) return;
 
-    let md = "# Annotated Reader — Exporterad historik\n\n";
-    md += `Exporterad: ${new Date().toLocaleString("sv-SE")}\n\n`;
+    let md = `# ${t.exportRubrik}\n\n`;
+    md += `${t.exportDatum}: ${new Date().toLocaleString(t.datumLocale)}\n\n`;
 
     const hanterade = new Set();
 
@@ -130,18 +156,18 @@ document.getElementById("exportera").addEventListener("click", async () => {
         const sess = chattar[id];
 
         md += `## ${ann.text}\n`;
-        md += `**Kategori:** ${ann.kategori}  \n`;
-        md += `**Beskrivning:** ${ann.beskrivning}\n\n`;
+        md += `**${t.exportKategori}:** ${ann.kategori}  \n`;
+        md += `**${t.exportBeskrivning}:** ${ann.beskrivning}\n\n`;
 
         if (sess?.historik?.length > 0) {
             for (const msg of sess.historik) {
                 if (msg.silent) continue;
-                const roll = msg.role === "user" ? "**Du**" : "**AI**";
+                const roll = msg.role === "user" ? `**${t.exportDu}**` : "**AI**";
                 const text = typeof msg.content === "string" ? msg.content : msg.content[0]?.text || "";
                 md += `${roll}: ${text}\n\n`;
             }
         } else {
-            md += `*Ingen chatt*\n\n`;
+            md += `${t.exportIngenChatt}\n\n`;
         }
         md += "---\n\n";
     }
@@ -149,11 +175,11 @@ document.getElementById("exportera").addEventListener("click", async () => {
     for (const [id, sess] of Object.entries(chattar)) {
         if (hanterade.has(id) || !sess.historik?.length) continue;
         md += `## ${sess.fras}\n`;
-        md += `**Kategori:** ${sess.kategori}  \n`;
-        md += `**Beskrivning:** ${sess.beskrivning}\n\n`;
+        md += `**${t.exportKategori}:** ${sess.kategori}  \n`;
+        md += `**${t.exportBeskrivning}:** ${sess.beskrivning}\n\n`;
         for (const msg of sess.historik) {
             if (msg.silent) continue;
-            const roll = msg.role === "user" ? "**Du**" : "**AI**";
+            const roll = msg.role === "user" ? `**${t.exportDu}**` : "**AI**";
             const text = typeof msg.content === "string" ? msg.content : msg.content[0]?.text || "";
             md += `${roll}: ${text}\n\n`;
         }
@@ -172,14 +198,15 @@ document.getElementById("exportera").addEventListener("click", async () => {
 });
 
 async function startaKonversation() {
-    historik.push({ role: "user", content: "Förklara detta i sitt sammanhang.", silent: true });
+    const startfråga = nuvarandeMarkeringId === "ar_chat_hela_sidan" ? t.forklaraHela : t.forklaraSammanhang;
+    historik.push({ role: "user", content: startfråga, silent: true });
     await sparaHistorik();
 
     const tänker = visaTänker();
     const svar = await chrome.runtime.sendMessage({ type: "CHAT", systemprompt, historik });
     tänker.remove();
 
-    const assistantText = svar?.result?.content?.[0]?.text || "Något gick fel.";
+    const assistantText = svar?.result?.content?.[0]?.text || t.nagorGickFel;
     laggTillBubbla("assistant", assistantText);
     historik.push({ role: "assistant", content: assistantText });
     await sparaHistorik();
@@ -202,7 +229,7 @@ async function infogeraKorsreferens(annan) {
         return `${roll}: ${text}`;
     }).join("\n");
 
-    const korsrefText = `[Korsreferens till "${annan.fras}"]\n${utdrag}\n\nHur relaterar detta till vår diskussion om "${nuvarandeMeta.fras}"?`;
+    const korsrefText = t.korsrefMeddelande(annan.fras, utdrag, nuvarandeMeta.fras);
 
     laggTillBubbla("user", korsrefText);
     historik.push({ role: "user", content: korsrefText });
@@ -212,7 +239,7 @@ async function infogeraKorsreferens(annan) {
     const svar = await chrome.runtime.sendMessage({ type: "CHAT", systemprompt, historik });
     tänker.remove();
 
-    const assistantText = svar?.result?.content?.[0]?.text || "Något gick fel.";
+    const assistantText = svar?.result?.content?.[0]?.text || t.nagorGickFel;
     laggTillBubbla("assistant", assistantText);
     historik.push({ role: "assistant", content: assistantText });
     await sparaHistorik();
@@ -232,7 +259,7 @@ async function skicka() {
     const svar = await chrome.runtime.sendMessage({ type: "CHAT", systemprompt, historik });
     tänker.remove();
 
-    const assistantText = svar?.result?.content?.[0]?.text || "Något gick fel.";
+    const assistantText = svar?.result?.content?.[0]?.text || t.nagorGickFel;
     laggTillBubbla("assistant", assistantText);
     historik.push({ role: "assistant", content: assistantText });
     await sparaHistorik();
@@ -241,7 +268,11 @@ async function skicka() {
 function laggTillBubbla(roll, text, skrolla = true) {
     const div = document.createElement("div");
     div.className = `bubbla ${roll}`;
-    div.textContent = text;
+    if (roll === "assistant") {
+        div.innerHTML = marked.parse(text);
+    } else {
+        div.textContent = text;
+    }
     const container = document.getElementById("meddelanden");
     container.appendChild(div);
     if (skrolla) container.scrollTop = container.scrollHeight;

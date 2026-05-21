@@ -1,3 +1,4 @@
+importScripts('locales.js');
 console.log("background.js laddad");
 
 // --- Token-loggning ---
@@ -12,7 +13,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     console.log("Meddelande mottaget:", message.type);
 
     if (message.type === "ANNOTATE") {
-        chrome.storage.local.get(["apiKey", "modell", "temperature"], async (result) => {
+        chrome.storage.local.get(["apiKey", "modell", "temperature", "lang"], async (result) => {
             const apiKey = result.apiKey;
             if (!apiKey) {
                 sendResponse({ error: "Ingen API-nyckel" });
@@ -21,6 +22,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
             const modell = result.modell || "claude-opus-4-7";
             const temperature = result.temperature ?? 1.0;
+            const lang = result.lang || "en";
+            const t = AR_LOCALES[lang] || AR_LOCALES.en;
 
             const response = await fetch("https://api.anthropic.com/v1/messages", {
                 method: "POST",
@@ -37,25 +40,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                     messages: [
                         {
                             role: "user",
-                            content: `Analysera följande text och returnera ENDAST ett JSON-objekt utan förklaringar eller markdown.
-
-Identifiera själv 3-5 meningsfulla kategorier som passar textens innehåll och tema.
-För varje kategori, välj en distinkt färg i hex-format.
-Annotera sedan texten med fraser som tillhör kategorierna.
-
-Format:
-{
-  "sammanfattning": "En eller ett par meningar om vad texten handlar om",
-  "kategorier": [
-    {"namn": "kategorinamn", "farg": "#hexfarg", "beskrivning": "kort beskrivning av kategorin"}
-  ],
-  "annoteringar": [
-    {"text": "...", "kategori": "kategorinamn", "beskrivning": "..."}
-  ]
-}
-
-Text:
-${message.text}`
+                            content: t.annoteringsPrompt(message.text)
                         }
                     ]
                 })
@@ -69,7 +54,7 @@ ${message.text}`
     }
 
     if (message.type === "CHAT") {
-        chrome.storage.local.get(["apiKey", "modell", "temperature"], async (result) => {
+        chrome.storage.local.get(["apiKey", "modell", "temperature", "lang"], async (result) => {
             const apiKey = result.apiKey;
             if (!apiKey) {
                 sendResponse({ error: "Ingen API-nyckel" });
@@ -78,6 +63,7 @@ ${message.text}`
 
             const modell = result.modell || "claude-opus-4-7";
             const temperature = result.temperature ?? 1.0;
+            const lang = result.lang || "en";
 
             // --- Cache-kontroll på sista meddelandet i historiken ---
             const historikMedCache = message.historik.map((msg, index) => {
