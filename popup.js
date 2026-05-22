@@ -125,7 +125,28 @@ function visaKvot(data) {
         document.getElementById("modell-val").insertAdjacentElement("afterend", info);
     }
 
-    if (data.vip) { kvotInfo.style.display = "none"; return; }
+    if (data.vip) {
+        kvotInfo.style.display = "block";
+        document.getElementById("kvot-text").textContent = popupT.vipPlan || "VIP — unlimited";
+        document.getElementById("kvot-bar").style.width = "100%";
+        document.getElementById("kvot-bar").style.background = "#f0c040";
+        const panel = document.getElementById("uppgradera-plan");
+        panel.style.display = "block";
+        const manageBtn = document.createElement("button");
+        manageBtn.textContent = popupT.hanteraPrenumeration || "Manage subscription →";
+        manageBtn.style.cssText = "width:100%;padding:7px;background:#eee;border:1px solid #ccc;border-radius:4px;cursor:pointer;font-size:11px;margin-top:8px;";
+        manageBtn.onclick = async () => {
+            const { arToken } = await new Promise(r => chrome.storage.local.get("arToken", r));
+            const resp = await fetch("https://annotated-reader-backend.vercel.app/api/portal", {
+                method: "POST",
+                headers: { "Authorization": `Bearer ${arToken}` }
+            });
+            const data = await resp.json();
+            if (data.url) chrome.tabs.create({ url: data.url });
+        };
+        panel.appendChild(manageBtn);
+        return;
+    }
 
     const procent = Math.min(100, Math.round((data.kreditAnvänd / data.kreditGräns) * 100));
     const kvarK = Math.round(data.kreditKvar / 1000);
