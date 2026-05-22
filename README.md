@@ -1,6 +1,7 @@
 # AIuda Reader
 
 Ett Chrome-tillägg som använder Claude AI för att analysera och annotera webbtext — och låter dig utforska innehållet genom konversation, på valfritt språk.
+Tilläget fungerar både i Chrome och i Edge.
 
 ---
 
