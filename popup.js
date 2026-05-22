@@ -114,6 +114,16 @@ function visaKvot(data) {
         `${kvarK}k krediter kvar denna månad (${data.plan})`;
     document.getElementById("kvot-bar").style.width = `${procent}%`;
     document.getElementById("kvot-bar").style.background = procent > 80 ? "#e55" : "#f0c040";
+
+    const gammalVarning = document.getElementById("kvot-varning");
+    if (gammalVarning) gammalVarning.remove();
+    if (procent > 80) {
+        const varning = document.createElement("div");
+        varning.id = "kvot-varning";
+        varning.style.cssText = "margin-top:6px;font-size:11px;color:#c00;font-weight:600;";
+        varning.textContent = popupT.kvotVarning || "⚠ You are approaching your monthly limit.";
+        document.getElementById("kvot-info").appendChild(varning);
+    }
     kvotInfo.style.display = "block";
 }
 
