@@ -144,6 +144,54 @@ function visaKvot(data) {
         document.getElementById("kvot-info").appendChild(varning);
     }
     kvotInfo.style.display = "block";
+
+    // Uppgraderingsknappar
+    visaUppgradera(data.plan);
+}
+
+async function köpProdukt(produkt) {
+    const { arToken } = await new Promise(r => chrome.storage.local.get("arToken", r));
+    if (!arToken) return;
+    try {
+        const resp = await fetch("https://annotated-reader-backend.vercel.app/api/checkout", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${arToken}` },
+            body: JSON.stringify({ produkt })
+        });
+        const data = await resp.json();
+        if (data.url) chrome.tabs.create({ url: data.url });
+    } catch (e) {}
+}
+
+function visaUppgradera(plan) {
+    const panel = document.getElementById("uppgradera-plan");
+    const proBtn = document.getElementById("uppgradera-pro-btn");
+    const vipBtn = document.getElementById("uppgradera-vip-btn");
+    const kreditBtns = document.querySelectorAll(".kredit-btn");
+    const isFree = plan === "free" || plan === "beta";
+    const isPro = plan === "pro";
+
+    panel.style.display = "block";
+    document.getElementById("krediter-rubrik").textContent = popupT.köpKrediter || "Buy credits";
+
+    if (isFree) {
+        proBtn.style.display = "block";
+        proBtn.textContent = popupT.uppgraderaPro || "Upgrade to Pro — €9.99/month";
+        proBtn.onclick = () => köpProdukt("pro");
+        vipBtn.style.display = "block";
+        vipBtn.textContent = popupT.uppgraderaVip || "Upgrade to VIP — €19.99/month";
+        vipBtn.onclick = () => köpProdukt("vip");
+        const freeProds = ["credits_500k_free", "credits_2m_free", "credits_10m_free"];
+        const freeLabels = ["500k €1.99", "2M €11.99", "10M €21.99"];
+        kreditBtns.forEach((btn, i) => { btn.textContent = freeLabels[i]; btn.onclick = () => köpProdukt(freeProds[i]); });
+    } else if (isPro) {
+        vipBtn.style.display = "block";
+        vipBtn.textContent = popupT.uppgraderaVip || "Upgrade to VIP — €19.99/month";
+        vipBtn.onclick = () => köpProdukt("vip");
+        const proProds = ["credits_500k_pro", "credits_2m_pro", "credits_10m_pro"];
+        const proLabels = ["500k €0.99", "2M €2.99", "10M €9.99"];
+        kreditBtns.forEach((btn, i) => { btn.textContent = proLabels[i]; btn.onclick = () => köpProdukt(proProds[i]); });
+    }
 }
 
 function visaAuthState(user) {
