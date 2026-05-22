@@ -15,7 +15,7 @@
         /* --- Mörkt tema (default) --- */
         body {
             font-family: 'DM Mono', monospace;
-            font-size: 13px;
+            font-size: var(--ar-font-size, 13px);
             display: flex;
             flex-direction: column;
             height: 100vh;
@@ -43,20 +43,29 @@
         }
 
         #exportera,
-        #tema-knapp {
+        #tema-knapp,
+        #font-liten,
+        #font-stor {
             background: transparent;
             border: 1px solid #444;
             color: #f5f0e8;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 11px;
             padding: 3px 8px;
             opacity: 0.7;
             letter-spacing: 0.05em;
+            line-height: 1;
         }
 
+        #exportera,
+        #tema-knapp { font-size: 11px; }
+        #font-liten { font-size: 10px; }
+        #font-stor  { font-size: 14px; font-weight: 600; }
+
         #exportera:hover,
-        #tema-knapp:hover {
+        #tema-knapp:hover,
+        #font-liten:hover,
+        #font-stor:hover {
             opacity: 1;
         }
 
@@ -169,7 +178,9 @@
         }
 
         body.ljust #exportera,
-        body.ljust #tema-knapp {
+        body.ljust #tema-knapp,
+        body.ljust #font-liten,
+        body.ljust #font-stor {
             border-color: #aaaaaa;
             color: #2a2218;
         }
@@ -294,8 +305,10 @@
 
 <body>
     <div id="header">
-        <span id="header-text">Annotated Reader</span>
+        <span id="header-text">AIuda Reader</span>
         <div id="header-knappar">
+            <button id="font-liten" title="Smaller text">A</button>
+            <button id="font-stor" title="Larger text">A</button>
             <button id="tema-knapp" title="Toggle theme">☀</button>
             <button id="exportera">↓ Export</button>
         </div>

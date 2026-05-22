@@ -1,11 +1,11 @@
 {
     "manifest_version": 3,
-    "name": "Annotated Reader",
+    "name": "AIuda Reader",
     "version": "0.9.2",
     "description": "Annoterar webbtext via Claude API",
     "action": {
         "default_popup": "popup.html",
-        "default_title": "Annotated Reader",
+        "default_title": "AIuda Reader",
         "default_icon": {
             "16": "icons/icon16.png",
             "48": "icons/icon48.png",

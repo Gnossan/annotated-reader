@@ -1,4 +1,4 @@
-# Annotated Reader
+# AIuda Reader
 
 Ett Chrome-tillägg (Manifest V3) som använder Claude AI för att analysera och annotera webbtext — och låter dig utforska innehållet genom konversation.
 
@@ -6,7 +6,7 @@ Ett Chrome-tillägg (Manifest V3) som använder Claude AI för att analysera och
 
 ## Vad det gör
 
-Annotated Reader läser texten på en webbsida, skickar den till Claude och markerar meningsfulla fraser med färgkodade kategorier som Claude själv hittar på utifrån textens tema. Du kan sedan klicka på vilken markering som helst för att läsa en förklaring, och öppna en sidopanel för att chatta med AI om just den frasen.
+AIuda Reader läser texten på en webbsida, skickar den till Claude och markerar meningsfulla fraser med färgkodade kategorier som Claude själv hittar på utifrån textens tema. Du kan sedan klicka på vilken markering som helst för att läsa en förklaring, och öppna en sidopanel för att chatta med AI om just den frasen.
 
 ---
 

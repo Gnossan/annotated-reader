@@ -4,12 +4,31 @@ let nuvarandeMarkeringId = null;
 let nuvarandeMeta = {};
 let t = AR_LOCALES.en;
 
-chrome.storage.local.get(["lang", "tema"], ({ lang = "en", tema = "mörkt" }) => {
+chrome.storage.local.get(["lang", "tema", "fontSize"], ({ lang = "en", tema = "mörkt", fontSize = 13 }) => {
     t = AR_LOCALES[lang] || AR_LOCALES.en;
     document.getElementById("header-text").textContent  = t.header;
     document.getElementById("exportera").textContent    = t.exportera;
     document.getElementById("input").placeholder        = t.stallEnFraga;
     tillampaTemat(tema);
+    tillampaFontSize(fontSize);
+});
+
+function tillampaFontSize(size) {
+    document.documentElement.style.setProperty("--ar-font-size", size + "px");
+}
+
+document.getElementById("font-liten").addEventListener("click", () => {
+    const nuvarande = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--ar-font-size")) || 13;
+    const ny = Math.max(10, nuvarande - 1);
+    tillampaFontSize(ny);
+    chrome.storage.local.set({ fontSize: ny });
+});
+
+document.getElementById("font-stor").addEventListener("click", () => {
+    const nuvarande = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--ar-font-size")) || 13;
+    const ny = Math.min(18, nuvarande + 1);
+    tillampaFontSize(ny);
+    chrome.storage.local.set({ fontSize: ny });
 });
 
 function tillampaTemat(tema) {
@@ -206,10 +225,15 @@ async function startaKonversation() {
     const svar = await chrome.runtime.sendMessage({ type: "CHAT", systemprompt, historik });
     tänker.remove();
 
-    const assistantText = svar?.result?.content?.[0]?.text || t.nagorGickFel;
+    const assistantText = tolkSvar(svar);
     laggTillBubbla("assistant", assistantText);
     historik.push({ role: "assistant", content: assistantText });
     await sparaHistorik();
+}
+
+function tolkSvar(svar) {
+    if (svar?.error === "quota_exceeded") return t.kvotSlut || "Du har använt alla krediter för denna månad. Uppgradera din plan för att fortsätta.";
+    return svar?.result?.content?.[0]?.text || t.nagorGickFel;
 }
 
 function visaTänker() {
@@ -239,7 +263,7 @@ async function infogeraKorsreferens(annan) {
     const svar = await chrome.runtime.sendMessage({ type: "CHAT", systemprompt, historik });
     tänker.remove();
 
-    const assistantText = svar?.result?.content?.[0]?.text || t.nagorGickFel;
+    const assistantText = tolkSvar(svar);
     laggTillBubbla("assistant", assistantText);
     historik.push({ role: "assistant", content: assistantText });
     await sparaHistorik();
@@ -259,7 +283,7 @@ async function skicka() {
     const svar = await chrome.runtime.sendMessage({ type: "CHAT", systemprompt, historik });
     tänker.remove();
 
-    const assistantText = svar?.result?.content?.[0]?.text || t.nagorGickFel;
+    const assistantText = tolkSvar(svar);
     laggTillBubbla("assistant", assistantText);
     historik.push({ role: "assistant", content: assistantText });
     await sparaHistorik();
