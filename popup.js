@@ -33,6 +33,25 @@ document.getElementById("consent-knapp").addEventListener("click", () => {
     });
 });
 
+// --- Versionskoll ---
+async function kollaVersion() {
+    try {
+        const nuvarande = chrome.runtime.getManifest().version;
+        const resp = await fetch("https://api.github.com/repos/Gnossan/annotated-reader/releases/latest");
+        if (!resp.ok) return;
+        const data = await resp.json();
+        const senaste = data.tag_name?.replace(/[^0-9.]/g, "");
+        if (senaste && senaste !== nuvarande) {
+            document.getElementById("ny-version-text").textContent =
+                `Version ${senaste} finns tillgänglig.`;
+            document.getElementById("ny-version-lank").textContent = "Ladda ner →";
+            document.getElementById("ny-version-lank").href = data.html_url;
+            document.getElementById("ny-version").style.display = "block";
+        }
+    } catch (e) {}
+}
+kollaVersion();
+
 // --- Auth ---
 chrome.storage.local.get(["arUser", "arToken", "modell", "temperature", "lang"], (result) => {
     const lang  = result.lang  || "en";
