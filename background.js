@@ -1,7 +1,7 @@
 importScripts('locales.js');
 console.log("background.js laddad");
 
-const BACKEND = "https://annotated-reader-backend-dev.vercel.app"; // DEV/TEST
+const BACKEND = "https://annotated-reader-backend.vercel.app";
 const FIREBASE_API_KEY = "AIzaSyCmClubetYGavOEVHBUHKQ-_sZZdt-LIWc";
 
 chrome.runtime.onMessageExternal.addListener((message, sender, sendResponse) => {
