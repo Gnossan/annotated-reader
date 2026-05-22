@@ -16,6 +16,7 @@ const AR_CONTENT = {
         annoteraOm:            "Re-annotate",
         analyserar:            "Analyzing",
         fel:               "✗ Error",
+        kvotSlut:          "⚠ Monthly limit reached. Upgrade your plan.",
         avbruten:          "✗ Cancelled",
         klar:              "✓ Done",
         exporteraChatt:    "↓ Export chat",
@@ -52,6 +53,7 @@ const AR_CONTENT = {
         annoteraOm:            "Re-annotate",
         analyserar:            "Analysing",
         fel:               "✗ Error",
+        kvotSlut:          "⚠ Monthly limit reached. Upgrade your plan.",
         avbruten:          "✗ Cancelled",
         klar:              "✓ Done",
         exporteraChatt:    "↓ Export chat",
@@ -84,7 +86,7 @@ const AR_CONTENT = {
     es: {
         chatOmSidan: "Chat sobre la página", redanAnnoterad: "Página ya anotada",
         redanAnnoteradText: "Esto eliminará todas las anotaciones e historial de chat.", annoteraOm: "Volver a anotar",
-        analyserar: "Analizando", fel: "✗ Error", avbruten: "✗ Cancelado", klar: "✓ Listo",
+        analyserar: "Analizando", fel: "✗ Error", kvotSlut: "⚠ Límite mensual alcanzado.", avbruten: "✗ Cancelado", klar: "✓ Listo",
         exporteraChatt: "↓ Exportar chat", exporterar: "⏳ Exportando...", exporterad: "✓ Exportado",
         lamnaSidan: "¿Salir de la página?", aktivaChattar: "Tienes chats activos — ¿quieres exportar el historial antes de salir?",
         exporteraOchLamna: "Exportar y salir", lamnaAnda: "Salir de todas formas", avbryt: "Cancelar",
@@ -99,7 +101,7 @@ const AR_CONTENT = {
     fr: {
         chatOmSidan: "Chat sur la page", redanAnnoterad: "Page déjà annotée",
         redanAnnoteradText: "Cela effacera toutes les annotations et l'historique de chat.", annoteraOm: "Ré-annoter",
-        analyserar: "Analyse en cours", fel: "✗ Erreur", avbruten: "✗ Annulé", klar: "✓ Terminé",
+        analyserar: "Analyse en cours", fel: "✗ Erreur", kvotSlut: "⚠ Limite mensuel atteint.", avbruten: "✗ Annulé", klar: "✓ Terminé",
         exporteraChatt: "↓ Exporter le chat", exporterar: "⏳ Export en cours...", exporterad: "✓ Exporté",
         lamnaSidan: "Quitter la page ?", aktivaChattar: "Vous avez des chats actifs — voulez-vous exporter l'historique avant de quitter ?",
         exporteraOchLamna: "Exporter et quitter", lamnaAnda: "Quitter quand même", avbryt: "Annuler",
@@ -114,7 +116,7 @@ const AR_CONTENT = {
     de: {
         chatOmSidan: "Chat über die Seite", redanAnnoterad: "Seite bereits annotiert",
         redanAnnoteradText: "Alle Annotierungen und Chatverläufe werden gelöscht.", annoteraOm: "Erneut annotieren",
-        analyserar: "Analysiere", fel: "✗ Fehler", avbruten: "✗ Abgebrochen", klar: "✓ Fertig",
+        analyserar: "Analysiere", fel: "✗ Fehler", kvotSlut: "⚠ Monatliches Limit erreicht.", avbruten: "✗ Abgebrochen", klar: "✓ Fertig",
         exporteraChatt: "↓ Chat exportieren", exporterar: "⏳ Exportiere...", exporterad: "✓ Exportiert",
         lamnaSidan: "Seite verlassen?", aktivaChattar: "Sie haben aktive Chats — möchten Sie den Verlauf exportieren?",
         exporteraOchLamna: "Exportieren und verlassen", lamnaAnda: "Trotzdem verlassen", avbryt: "Abbrechen",
@@ -129,7 +131,7 @@ const AR_CONTENT = {
     it: {
         chatOmSidan: "Chat sulla pagina", redanAnnoterad: "Pagina già annotata",
         redanAnnoteradText: "Verranno eliminate tutte le annotazioni e la cronologia chat.", annoteraOm: "Ri-annotare",
-        analyserar: "Analisi in corso", fel: "✗ Errore", avbruten: "✗ Annullato", klar: "✓ Fatto",
+        analyserar: "Analisi in corso", fel: "✗ Errore", kvotSlut: "⚠ Limite mensile raggiunto.", avbruten: "✗ Annullato", klar: "✓ Fatto",
         exporteraChatt: "↓ Esporta chat", exporterar: "⏳ Esportazione...", exporterad: "✓ Esportato",
         lamnaSidan: "Lasciare la pagina?", aktivaChattar: "Hai chat attive — vuoi esportare la cronologia prima di uscire?",
         exporteraOchLamna: "Esporta ed esci", lamnaAnda: "Esci comunque", avbryt: "Annulla",
@@ -144,7 +146,7 @@ const AR_CONTENT = {
     no: {
         chatOmSidan: "Chat om siden", redanAnnoterad: "Siden er allerede annotert",
         redanAnnoteradText: "Dette vil slette alle annoteringer og chat-historikk.", annoteraOm: "Annotér på nytt",
-        analyserar: "Analyserer", fel: "✗ Feil", avbruten: "✗ Avbrutt", klar: "✓ Ferdig",
+        analyserar: "Analyserer", fel: "✗ Feil", kvotSlut: "⚠ Månedlig grense nådd.", avbruten: "✗ Avbrutt", klar: "✓ Ferdig",
         exporteraChatt: "↓ Eksporter chat", exporterar: "⏳ Eksporterer...", exporterad: "✓ Eksportert",
         lamnaSidan: "Forlate siden?", aktivaChattar: "Du har aktive chatter — vil du eksportere historikken?",
         exporteraOchLamna: "Eksporter og forlat", lamnaAnda: "Forlat likevel", avbryt: "Avbryt",
@@ -159,7 +161,7 @@ const AR_CONTENT = {
     da: {
         chatOmSidan: "Chat om siden", redanAnnoterad: "Siden er allerede annoteret",
         redanAnnoteradText: "Dette vil slette alle annoteringer og chathistorik.", annoteraOm: "Annotér igen",
-        analyserar: "Analyserer", fel: "✗ Fejl", avbruten: "✗ Afbrudt", klar: "✓ Færdig",
+        analyserar: "Analyserer", fel: "✗ Fejl", kvotSlut: "⚠ Månedlig grænse nået.", avbruten: "✗ Afbrudt", klar: "✓ Færdig",
         exporteraChatt: "↓ Eksportér chat", exporterar: "⏳ Eksporterer...", exporterad: "✓ Eksporteret",
         lamnaSidan: "Forlad siden?", aktivaChattar: "Du har aktive chats — vil du eksportere historikken?",
         exporteraOchLamna: "Eksportér og forlad", lamnaAnda: "Forlad alligevel", avbryt: "Annullér",
@@ -178,6 +180,7 @@ const AR_CONTENT = {
         annoteraOm:            "Annotera om",
         analyserar:            "Analyserar",
         fel:               "✗ Fel",
+        kvotSlut:          "⚠ Månadsgränsen är nådd. Uppgradera din plan.",
         avbruten:          "✗ Avbruten",
         klar:              "✓ Klar",
         exporteraChatt:    "↓ Exportera chatt",
@@ -822,9 +825,14 @@ function startAnnotering(text) {
             if (annoteringIgnoreras) return;
 
             if (!response?.result?.content?.[0]?.text) {
-                console.log("Inget svar att rita");
-                overlay.textContent = t.fel;
-                setTimeout(() => overlay.remove(), 2000);
+                console.log("Inget svar att rita:", response?.error);
+                if (response?.error === "quota_exceeded") {
+                    overlay.textContent = t.kvotSlut || "⚠ Monthly limit reached.";
+                    setTimeout(() => overlay.remove(), 4000);
+                } else {
+                    overlay.textContent = t.fel;
+                    setTimeout(() => overlay.remove(), 2000);
+                }
                 return;
             }
 
