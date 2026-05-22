@@ -1,6 +1,75 @@
 importScripts('locales.js');
 console.log("background.js laddad");
 
+const BACKEND = "https://annotated-reader-backend.vercel.app";
+const FIREBASE_API_KEY = "AIzaSyCmClubetYGavOEVHBUHKQ-_sZZdt-LIWc";
+
+chrome.runtime.onMessageExternal.addListener((message, sender, sendResponse) => {
+    if (message.type === "AUTH_COMPLETE") {
+        chrome.storage.local.set({
+            arToken: message.token,
+            arRefreshToken: message.refreshToken || null,
+            arUser: { email: message.email, name: message.name, photo: message.photo }
+        }, () => {
+            chrome.action.openPopup();
+        });
+        sendResponse({ ok: true });
+    }
+});
+
+async function hämtaToken() {
+    return new Promise((resolve) => {
+        chrome.storage.local.get("arToken", ({ arToken }) => resolve(arToken || null));
+    });
+}
+
+async function förnyaToken() {
+    const { arRefreshToken } = await chrome.storage.local.get("arRefreshToken");
+    if (!arRefreshToken) return null;
+
+    try {
+        const resp = await fetch(
+            `https://securetoken.googleapis.com/v1/token?key=${FIREBASE_API_KEY}`,
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: `grant_type=refresh_token&refresh_token=${encodeURIComponent(arRefreshToken)}`
+            }
+        );
+        if (!resp.ok) return null;
+        const data = await resp.json();
+        await chrome.storage.local.set({
+            arToken: data.id_token,
+            arRefreshToken: data.refresh_token
+        });
+        console.log("Token förnyad automatiskt");
+        return data.id_token;
+    } catch (e) {
+        console.error("Token-förnyelse misslyckades:", e);
+        return null;
+    }
+}
+
+async function fetchMedToken(url, options, token) {
+    let resp = await fetch(url, {
+        ...options,
+        headers: { ...options.headers, "Authorization": `Bearer ${token}` }
+    });
+
+    if (resp.status === 401) {
+        console.log("401 – försöker förnya token automatiskt...");
+        const nyToken = await förnyaToken();
+        if (nyToken) {
+            resp = await fetch(url, {
+                ...options,
+                headers: { ...options.headers, "Authorization": `Bearer ${nyToken}` }
+            });
+        }
+    }
+
+    return resp;
+}
+
 // --- Token-loggning ---
 function loggaTokens(typ, usage) {
     const total = (usage.input_tokens || 0) + (usage.output_tokens || 0);
@@ -13,106 +82,64 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     console.log("Meddelande mottaget:", message.type);
 
     if (message.type === "ANNOTATE") {
-        chrome.storage.local.get(["apiKey", "modell", "temperature", "lang"], async (result) => {
-            const apiKey = result.apiKey;
-            if (!apiKey) {
-                sendResponse({ error: "Ingen API-nyckel" });
-                return;
-            }
-
+        chrome.storage.local.get(["modell", "temperature", "lang"], async (result) => {
             const modell = result.modell || "claude-opus-4-7";
             const temperature = result.temperature ?? 1.0;
             const lang = result.lang || "en";
             const t = AR_LOCALES[lang] || AR_LOCALES.en;
+            const token = await hämtaToken();
 
-            const response = await fetch("https://api.anthropic.com/v1/messages", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "x-api-key": apiKey,
-                    "anthropic-version": "2023-06-01",
-                    "anthropic-dangerous-direct-browser-access": "true"
+            if (!token) { sendResponse({ error: "Ej inloggad" }); return; }
+
+            const response = await fetchMedToken(
+                `${BACKEND}/api/annotate`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        text: message.text,
+                        prompt: t.annoteringsPrompt(message.text),
+                        model: modell,
+                        temperature
+                    })
                 },
-                body: JSON.stringify({
-                    model: modell,
-                    max_tokens: 4096,
-                    temperature,
-                    messages: [
-                        {
-                            role: "user",
-                            content: t.annoteringsPrompt(message.text)
-                        }
-                    ]
-                })
-            });
+                token
+            );
 
             const data = await response.json();
-            if (data.usage) loggaTokens("ANNOTATE", data.usage);
-            sendResponse({ result: data });
+            if (data.result?.usage) loggaTokens("ANNOTATE", data.result.usage);
+            sendResponse({ result: data.result });
         });
         return true;
     }
 
     if (message.type === "CHAT") {
-        chrome.storage.local.get(["apiKey", "modell", "temperature", "lang"], async (result) => {
-            const apiKey = result.apiKey;
-            if (!apiKey) {
-                sendResponse({ error: "Ingen API-nyckel" });
-                return;
-            }
-
+        chrome.storage.local.get(["modell", "temperature"], async (result) => {
             const modell = result.modell || "claude-opus-4-7";
             const temperature = result.temperature ?? 1.0;
-            const lang = result.lang || "en";
+            const token = await hämtaToken();
 
-            // --- Cache-kontroll på sista meddelandet i historiken ---
-            const historikMedCache = message.historik.map((msg, index) => {
-                const { silent, ...renMsg } = msg;
-                if (index === message.historik.length - 1) {
-                    let contentText;
-                    try {
-                        contentText = typeof renMsg.content === "string"
-                            ? renMsg.content
-                            : renMsg.content?.[0]?.text ?? "";
-                    } catch (e) {
-                        console.error("Cache-fel: msg =", JSON.stringify(msg), "fel =", e.message);
-                        contentText = "";
-                    }
-                    return {
-                        ...renMsg,
-                        content: [{ type: "text", text: contentText, cache_control: { type: "ephemeral" } }]
-                    };
-                }
-                return renMsg;
-            });
+            if (!token) { sendResponse({ error: "Ej inloggad" }); return; }
 
-            const response = await fetch("https://api.anthropic.com/v1/messages", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "x-api-key": apiKey,
-                    "anthropic-version": "2023-06-01",
-                    "anthropic-dangerous-direct-browser-access": "true"
+            const response = await fetchMedToken(
+                `${BACKEND}/api/chat`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        historik: message.historik,
+                        systemprompt: message.systemprompt,
+                        model: modell,
+                        temperature
+                    })
                 },
-                body: JSON.stringify({
-                    model: modell,
-                    max_tokens: 1024,
-                    temperature,
-                    system: [
-                        {
-                            type: "text",
-                            text: message.systemprompt,
-                            cache_control: { type: "ephemeral" }
-                        }
-                    ],
-                    messages: historikMedCache
-                })
-            });
+                token
+            );
 
             const data = await response.json();
             console.log("CHAT råsvar:", JSON.stringify(data));
-            if (data.usage) loggaTokens("CHAT", data.usage);
-            sendResponse({ result: data });
+            if (data.result?.usage) loggaTokens("CHAT", data.result.usage);
+            sendResponse({ result: data.result });
         });
         return true;
     }
@@ -124,7 +151,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             kategori: message.kategori,
             beskrivning: message.beskrivning,
             sammanfattning: message.sammanfattning,
-            kategorier: message.kategorier
+            kategorier: message.kategorier,
+            helText: message.helText
         };
         chrome.sidePanel.open({ windowId: sender.tab.windowId });
         setTimeout(() => {

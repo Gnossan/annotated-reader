@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Annotated Reader",
-    "version": "0.9.1",
+    "version": "0.9.2",
     "description": "Annoterar webbtext via Claude API",
     "action": {
         "default_popup": "popup.html",
@@ -21,11 +21,15 @@
         "activeTab",
         "scripting",
         "storage",
-        "sidePanel"
+        "sidePanel",
+        "offscreen"
     ],
     "host_permissions": [
-        "https://api.anthropic.com/*"
+        "https://annotated-reader-backend.vercel.app/*"
     ],
+    "externally_connectable": {
+        "matches": ["https://annotated-reader-backend.vercel.app/*"]
+    },
     "background": {
         "service_worker": "background.js"
     },

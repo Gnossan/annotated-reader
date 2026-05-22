@@ -1,4 +1,115 @@
 const status = document.getElementById("status");
+let popupT = AR_LOCALES.en; // uppdateras när lang laddas
+
+// --- Auth ---
+chrome.storage.local.get(["arUser", "arToken", "modell", "temperature", "lang"], (result) => {
+    const lang  = result.lang  || "en";
+    const modell = result.modell || "claude-opus-4-7";
+    const temp  = result.temperature ?? 1.0;
+
+    popupT = AR_LOCALES[lang] || AR_LOCALES.en;
+
+    document.getElementById("sprak-val").value  = lang;
+    document.getElementById("modell-val").value = modell;
+    document.getElementById("temp-slider").value = temp;
+    document.getElementById("temp-värde").textContent = parseFloat(temp).toFixed(1);
+
+    tillampaSprak(popupT);
+    visaAuthState(result.arUser || null);
+    if (result.arToken) hämtaKvot(result.arToken);
+});
+
+chrome.runtime.onMessage.addListener((msg) => {
+    if (msg.type === "AUTH_COMPLETE") {
+        chrome.storage.local.get(["arUser", "arToken"], ({ arUser, arToken }) => {
+            visaAuthState(arUser || null);
+            if (arToken) hämtaKvot(arToken);
+        });
+    }
+});
+
+async function hämtaKvot(token) {
+    try {
+        const resp = await fetch("https://annotated-reader-backend.vercel.app/api/status", {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (!resp.ok) return;
+        const data = await resp.json();
+        visaKvot(data);
+    } catch (e) {}
+}
+
+function visaKvot(data) {
+    const kvotInfo = document.getElementById("kvot-info");
+
+    // Dölj modellväljaren för free och beta — backenden bestämmer
+    const modellRad = document.getElementById("modell-label")?.parentElement;
+    if (data.plan === "free" || data.plan === "beta") {
+        document.getElementById("modell-label").style.display = "none";
+        document.getElementById("modell-val").style.display = "none";
+        const info = document.createElement("div");
+        info.style.cssText = "font-size:11px;opacity:0.6;margin-bottom:12px;";
+        info.innerHTML = `${popupT.modellInfoFree}
+            <span id="modell-info-knapp" style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;border:1px solid #999;font-size:9px;cursor:pointer;margin-left:4px;vertical-align:middle;">i</span>`;
+        const uppgraderaText = document.createElement("div");
+        uppgraderaText.id = "modell-uppgradera";
+        uppgraderaText.style.cssText = "display:none;margin-top:6px;padding:6px;background:#fff;border:1px solid #ddd;border-radius:4px;font-size:11px;line-height:1.4;color:#444;";
+        uppgraderaText.textContent = popupT.modellUppgradera;
+        info.appendChild(uppgraderaText);
+        setTimeout(() => {
+            document.getElementById("modell-info-knapp")?.addEventListener("click", () => {
+                const el = document.getElementById("modell-uppgradera");
+                el.style.display = el.style.display === "none" ? "block" : "none";
+            });
+        }, 0);
+        document.getElementById("modell-val").insertAdjacentElement("afterend", info);
+    }
+
+    if (data.vip) { kvotInfo.style.display = "none"; return; }
+
+    const procent = Math.min(100, Math.round((data.kreditAnvänd / data.kreditGräns) * 100));
+    const kvarK = Math.round(data.kreditKvar / 1000);
+    document.getElementById("kvot-text").textContent =
+        `${kvarK}k krediter kvar denna månad (${data.plan})`;
+    document.getElementById("kvot-bar").style.width = `${procent}%`;
+    document.getElementById("kvot-bar").style.background = procent > 80 ? "#e55" : "#f0c040";
+    kvotInfo.style.display = "block";
+}
+
+function visaAuthState(user) {
+    const signInBtn   = document.getElementById("sign-in-btn");
+    const inloggad    = document.getElementById("inloggad-info");
+    const annotateBtn = document.getElementById("annotate-btn");
+
+    if (user) {
+        signInBtn.style.display   = "none";
+        inloggad.style.display    = "block";
+        annotateBtn.style.display = "block";
+        document.getElementById("user-name").textContent = user.name || user.email;
+        if (user.photo) document.getElementById("user-photo").src = user.photo;
+    } else {
+        signInBtn.style.display   = "flex";
+        inloggad.style.display    = "none";
+        annotateBtn.style.display = "none";
+    }
+}
+
+document.getElementById("sign-in-btn").addEventListener("click", () => {
+    const extId = chrome.runtime.id;
+    chrome.windows.create({
+        url: `https://annotated-reader-backend.vercel.app/auth.html?ext_id=${extId}`,
+        type: "popup",
+        width: 420,
+        height: 480,
+        focused: true
+    });
+    window.close();
+});
+
+document.getElementById("sign-out-btn").addEventListener("click", () => {
+    chrome.storage.local.remove(["arUser", "arToken"]);
+    visaAuthState(null);
+});
 
 const MODELLER = {
     "claude-opus-4-7":           { fixedTemp: true },
@@ -7,8 +118,7 @@ const MODELLER = {
 };
 
 function tillampaSprak(t) {
-    document.getElementById("api-key").placeholder        = t.apiPlaceholder;
-    document.getElementById("save-btn").textContent       = t.sparaNyckel;
+    popupT = t;
     document.getElementById("annotate-btn").textContent   = t.annoteraSidan;
     document.getElementById("avancerat-btn").textContent  = t.avancerat;
     document.getElementById("sprak-label").textContent    = t.sprakLabel;
@@ -24,37 +134,6 @@ function tillampaSprak(t) {
     uppdateraTempUI(modellVal.value, t);
 }
 
-// --- Ladda sparade inställningar ---
-chrome.storage.local.get(["apiKey", "modell", "temperature", "lang"], (result) => {
-    if (result.apiKey) {
-        const t = AR_LOCALES[result.lang || "en"] || AR_LOCALES.en;
-        document.getElementById("api-key").placeholder = t.nyckelSparad;
-        status.textContent = t.nyckelSparad;
-    }
-
-    const lang  = result.lang  || "en";
-    const modell = result.modell || "claude-opus-4-7";
-    const temp  = result.temperature ?? 1.0;
-
-    document.getElementById("sprak-val").value  = lang;
-    document.getElementById("modell-val").value = modell;
-    document.getElementById("temp-slider").value = temp;
-    document.getElementById("temp-värde").textContent = parseFloat(temp).toFixed(1);
-
-    tillampaSprak(AR_LOCALES[lang] || AR_LOCALES.en);
-});
-
-// --- API-nyckel ---
-document.getElementById("save-btn").addEventListener("click", () => {
-    const key = document.getElementById("api-key").value.trim();
-    if (!key) return;
-    chrome.storage.local.set({ apiKey: key }, () => {
-        const t = AR_LOCALES[document.getElementById("sprak-val").value] || AR_LOCALES.en;
-        status.textContent = t.sparad;
-        document.getElementById("api-key").value = "";
-        document.getElementById("api-key").placeholder = t.nyckelSparad;
-    });
-});
 
 // --- Annotera ---
 document.getElementById("annotate-btn").addEventListener("click", () => {
