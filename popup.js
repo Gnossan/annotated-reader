@@ -1,6 +1,26 @@
 const status = document.getElementById("status");
 let popupT = AR_LOCALES.en; // uppdateras när lang laddas
 
+// --- Consent ---
+chrome.storage.local.get(["consent", "lang"], ({ consent, lang = "en" }) => {
+    const t = AR_LOCALES[lang] || AR_LOCALES.en;
+    if (!consent) {
+        document.getElementById("consent-dialog").style.display = "block";
+        document.getElementById("consent-text").textContent = t.consentText;
+        document.getElementById("consent-lank").textContent = t.consentLank;
+        document.getElementById("consent-knapp").textContent = t.consentKnapp;
+    } else {
+        document.getElementById("huvud-innehall").style.display = "block";
+    }
+});
+
+document.getElementById("consent-knapp").addEventListener("click", () => {
+    chrome.storage.local.set({ consent: true }, () => {
+        document.getElementById("consent-dialog").style.display = "none";
+        document.getElementById("huvud-innehall").style.display = "block";
+    });
+});
+
 // --- Auth ---
 chrome.storage.local.get(["arUser", "arToken", "modell", "temperature", "lang"], (result) => {
     const lang  = result.lang  || "en";

@@ -101,6 +101,15 @@
 </head>
 
 <body>
+  <!-- Consent-dialog — visas första gången -->
+  <div id="consent-dialog" style="display:none;">
+    <p style="font-size:12px;line-height:1.6;margin-bottom:10px;" id="consent-text"></p>
+    <a id="consent-lank" href="https://annotated-reader-backend.vercel.app/privacy.html"
+       target="_blank" style="font-size:11px;color:#555;display:block;margin-bottom:12px;"></a>
+    <button id="consent-knapp" style="width:100%;padding:8px;background:#333;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px;"></button>
+  </div>
+
+  <div id="huvud-innehall" style="display:none;">
   <div id="auth-sektion">
     <div id="inloggad-info" style="display:none;margin-bottom:8px;">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
@@ -154,6 +163,7 @@
       </div>
     </div>
   </div>
+  </div><!-- slut huvud-innehall -->
   <div id="status"></div>
   <script src="locales.js"></script>
   <script src="popup.js"></script>
