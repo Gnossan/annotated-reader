@@ -299,7 +299,14 @@ function laggTillBubbla(roll, text, skrolla = true) {
     }
     const container = document.getElementById("meddelanden");
     container.appendChild(div);
-    if (skrolla) container.scrollTop = container.scrollHeight;
+    if (skrolla) {
+        if (roll === "assistant") {
+            // Scrolla till toppen av AI-svaret
+            div.scrollIntoView({ behavior: "smooth", block: "start" });
+        } else {
+            container.scrollTop = container.scrollHeight;
+        }
+    }
 }
 
 function visaLegende(kategorier) {
