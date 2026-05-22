@@ -2,22 +2,34 @@ const status = document.getElementById("status");
 let popupT = AR_LOCALES.en; // uppdateras när lang laddas
 
 // --- Consent ---
-chrome.storage.local.get(["consent", "lang"], ({ consent, lang = "en" }) => {
-    const t = AR_LOCALES[lang] || AR_LOCALES.en;
-    if (!consent) {
-        document.getElementById("consent-dialog").style.display = "block";
-        document.getElementById("consent-text").textContent = t.consentText;
-        document.getElementById("consent-lank").textContent = t.consentLank;
-        document.getElementById("consent-knapp").textContent = t.consentKnapp;
-    } else {
-        document.getElementById("huvud-innehall").style.display = "block";
-    }
-});
+function visaConsentOmBehövs(token, t) {
+    chrome.storage.local.get("consent", ({ consent }) => {
+        if (!consent) {
+            document.getElementById("huvud-innehall").style.display = "none";
+            document.getElementById("consent-dialog").style.display = "block";
+            document.getElementById("consent-text").textContent = t.consentText;
+            document.getElementById("consent-lank").textContent = t.consentLank;
+            document.getElementById("consent-knapp").textContent = t.consentKnapp;
+        } else {
+            document.getElementById("huvud-innehall").style.display = "block";
+        }
+    });
+}
 
 document.getElementById("consent-knapp").addEventListener("click", () => {
-    chrome.storage.local.set({ consent: true }, () => {
-        document.getElementById("consent-dialog").style.display = "none";
-        document.getElementById("huvud-innehall").style.display = "block";
+    chrome.storage.local.get(["arToken", "lang"], async ({ arToken, lang = "en" }) => {
+        // Spara centralt i Firestore
+        if (arToken) {
+            await fetch("https://annotated-reader-backend.vercel.app/api/consent", {
+                method: "POST",
+                headers: { "Authorization": `Bearer ${arToken}` }
+            }).catch(() => {});
+        }
+        // Spara lokalt
+        chrome.storage.local.set({ consent: true }, () => {
+            document.getElementById("consent-dialog").style.display = "none";
+            document.getElementById("huvud-innehall").style.display = "block";
+        });
     });
 });
 
@@ -36,14 +48,23 @@ chrome.storage.local.get(["arUser", "arToken", "modell", "temperature", "lang"],
 
     tillampaSprak(popupT);
     visaAuthState(result.arUser || null);
-    if (result.arToken) hämtaKvot(result.arToken);
+    if (result.arToken) {
+        hämtaKvot(result.arToken);
+        visaConsentOmBehövs(result.arToken, popupT);
+    } else {
+        document.getElementById("huvud-innehall").style.display = "block";
+    }
 });
 
 chrome.runtime.onMessage.addListener((msg) => {
     if (msg.type === "AUTH_COMPLETE") {
-        chrome.storage.local.get(["arUser", "arToken"], ({ arUser, arToken }) => {
+        chrome.storage.local.get(["arUser", "arToken", "lang"], ({ arUser, arToken, lang = "en" }) => {
+            const t = AR_LOCALES[lang] || AR_LOCALES.en;
             visaAuthState(arUser || null);
-            if (arToken) hämtaKvot(arToken);
+            if (arToken) {
+                hämtaKvot(arToken);
+                visaConsentOmBehövs(arToken, t);
+            }
         });
     }
 });
