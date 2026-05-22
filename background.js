@@ -106,6 +106,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 token
             );
 
+            if (response.status === 429) {
+                console.warn("⚠ KVOT SLUT [ANNOTATE]: Användaren har nått sin månadsgräns.\n→ Logga in på Firebase och höj kvoten, eller vänta till nästa månad.\n→ Admin: https://console.firebase.google.com");
+                const errData = await response.json().catch(() => ({}));
+                sendResponse({ error: "quota_exceeded", plan: errData.plan });
+                return;
+            }
             const data = await response.json();
             if (data.result?.usage) loggaTokens("ANNOTATE", data.result.usage);
             sendResponse({ result: data.result });
@@ -136,10 +142,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 token
             );
 
+            if (response.status === 429) {
+                console.warn("⚠ KVOT SLUT [CHAT]: Användaren har nått sin månadsgräns.\n→ Logga in på Firebase och höj kvoten, eller vänta till nästa månad.\n→ Admin: https://console.firebase.google.com");
+                const errData = await response.json().catch(() => ({}));
+                sendResponse({ error: "quota_exceeded", plan: errData.plan });
+                return;
+            }
             const data = await response.json();
             console.log("CHAT råsvar:", JSON.stringify(data));
             if (data.result?.usage) loggaTokens("CHAT", data.result.usage);
-            sendResponse({ result: data.result });
+            sendResponse({ result: data.result, error: data.error, plan: data.plan });
         });
         return true;
     }
