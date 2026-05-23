@@ -19,6 +19,7 @@ const AR_CONTENT = {
         kvotSlut:          "⚠ Monthly limit reached. Upgrade your plan or purchase additional credits.",
         avbruten:          "✗ Cancelled",
         klar:              "✓ Done",
+        tecken:            "characters",
         exporteraChatt:    "↓ Export chat",
         exporterar:        "⏳ Exporting...",
         exporterad:        "✓ Exported",
@@ -86,7 +87,7 @@ const AR_CONTENT = {
     es: {
         chatOmSidan: "Chat sobre la página", redanAnnoterad: "Página ya anotada",
         redanAnnoteradText: "Esto eliminará todas las anotaciones e historial de chat.", annoteraOm: "Volver a anotar",
-        analyserar: "Analizando", fel: "✗ Error", kvotSlut: "⚠ Límite mensual alcanzado. Actualiza tu plan o compra créditos adicionales.", avbruten: "✗ Cancelado", klar: "✓ Listo",
+        analyserar: "Analizando", fel: "✗ Error", kvotSlut: "⚠ Límite mensual alcanzado. Actualiza tu plan o compra créditos adicionales.", avbruten: "✗ Cancelado", klar: "✓ Listo", tecken: "caracteres",
         exporteraChatt: "↓ Exportar chat", exporterar: "⏳ Exportando...", exporterad: "✓ Exportado",
         lamnaSidan: "¿Salir de la página?", aktivaChattar: "Tienes chats activos — ¿quieres exportar el historial antes de salir?",
         exporteraOchLamna: "Exportar y salir", lamnaAnda: "Salir de todas formas", avbryt: "Cancelar",
@@ -101,7 +102,7 @@ const AR_CONTENT = {
     fr: {
         chatOmSidan: "Chat sur la page", redanAnnoterad: "Page déjà annotée",
         redanAnnoteradText: "Cela effacera toutes les annotations et l'historique de chat.", annoteraOm: "Ré-annoter",
-        analyserar: "Analyse en cours", fel: "✗ Erreur", kvotSlut: "⚠ Limite mensuel atteint. Mettez à niveau votre forfait ou achetez des crédits.", avbruten: "✗ Annulé", klar: "✓ Terminé",
+        analyserar: "Analyse en cours", fel: "✗ Erreur", kvotSlut: "⚠ Limite mensuel atteint. Mettez à niveau votre forfait ou achetez des crédits.", avbruten: "✗ Annulé", klar: "✓ Terminé", tecken: "caractères",
         exporteraChatt: "↓ Exporter le chat", exporterar: "⏳ Export en cours...", exporterad: "✓ Exporté",
         lamnaSidan: "Quitter la page ?", aktivaChattar: "Vous avez des chats actifs — voulez-vous exporter l'historique avant de quitter ?",
         exporteraOchLamna: "Exporter et quitter", lamnaAnda: "Quitter quand même", avbryt: "Annuler",
@@ -116,7 +117,7 @@ const AR_CONTENT = {
     de: {
         chatOmSidan: "Chat über die Seite", redanAnnoterad: "Seite bereits annotiert",
         redanAnnoteradText: "Alle Annotierungen und Chatverläufe werden gelöscht.", annoteraOm: "Erneut annotieren",
-        analyserar: "Analysiere", fel: "✗ Fehler", kvotSlut: "⚠ Monatliches Limit erreicht. Upgraden Sie Ihren Plan oder kaufen Sie Kredite.", avbruten: "✗ Abgebrochen", klar: "✓ Fertig",
+        analyserar: "Analysiere", fel: "✗ Fehler", kvotSlut: "⚠ Monatliches Limit erreicht. Upgraden Sie Ihren Plan oder kaufen Sie Kredite.", avbruten: "✗ Abgebrochen", klar: "✓ Fertig", tecken: "Zeichen",
         exporteraChatt: "↓ Chat exportieren", exporterar: "⏳ Exportiere...", exporterad: "✓ Exportiert",
         lamnaSidan: "Seite verlassen?", aktivaChattar: "Sie haben aktive Chats — möchten Sie den Verlauf exportieren?",
         exporteraOchLamna: "Exportieren und verlassen", lamnaAnda: "Trotzdem verlassen", avbryt: "Abbrechen",
@@ -131,7 +132,7 @@ const AR_CONTENT = {
     it: {
         chatOmSidan: "Chat sulla pagina", redanAnnoterad: "Pagina già annotata",
         redanAnnoteradText: "Verranno eliminate tutte le annotazioni e la cronologia chat.", annoteraOm: "Ri-annotare",
-        analyserar: "Analisi in corso", fel: "✗ Errore", kvotSlut: "⚠ Limite mensile raggiunto. Aggiorna il piano o acquista crediti aggiuntivi.", avbruten: "✗ Annullato", klar: "✓ Fatto",
+        analyserar: "Analisi in corso", fel: "✗ Errore", kvotSlut: "⚠ Limite mensile raggiunto. Aggiorna il piano o acquista crediti aggiuntivi.", avbruten: "✗ Annullato", klar: "✓ Fatto", tecken: "caratteri",
         exporteraChatt: "↓ Esporta chat", exporterar: "⏳ Esportazione...", exporterad: "✓ Esportato",
         lamnaSidan: "Lasciare la pagina?", aktivaChattar: "Hai chat attive — vuoi esportare la cronologia prima di uscire?",
         exporteraOchLamna: "Esporta ed esci", lamnaAnda: "Esci comunque", avbryt: "Annulla",
@@ -146,7 +147,7 @@ const AR_CONTENT = {
     no: {
         chatOmSidan: "Chat om siden", redanAnnoterad: "Siden er allerede annotert",
         redanAnnoteradText: "Dette vil slette alle annoteringer og chat-historikk.", annoteraOm: "Annotér på nytt",
-        analyserar: "Analyserer", fel: "✗ Feil", kvotSlut: "⚠ Månedlig grense nådd. Oppgrader planen eller kjøp ekstra kreditter.", avbruten: "✗ Avbrutt", klar: "✓ Ferdig",
+        analyserar: "Analyserer", fel: "✗ Feil", kvotSlut: "⚠ Månedlig grense nådd. Oppgrader planen eller kjøp ekstra kreditter.", avbruten: "✗ Avbrutt", klar: "✓ Ferdig", tecken: "tegn",
         exporteraChatt: "↓ Eksporter chat", exporterar: "⏳ Eksporterer...", exporterad: "✓ Eksportert",
         lamnaSidan: "Forlate siden?", aktivaChattar: "Du har aktive chatter — vil du eksportere historikken?",
         exporteraOchLamna: "Eksporter og forlat", lamnaAnda: "Forlat likevel", avbryt: "Avbryt",
@@ -161,7 +162,7 @@ const AR_CONTENT = {
     da: {
         chatOmSidan: "Chat om siden", redanAnnoterad: "Siden er allerede annoteret",
         redanAnnoteradText: "Dette vil slette alle annoteringer og chathistorik.", annoteraOm: "Annotér igen",
-        analyserar: "Analyserer", fel: "✗ Fejl", kvotSlut: "⚠ Månedlig grænse nået. Opgrader din plan eller køb ekstra kreditter.", avbruten: "✗ Afbrudt", klar: "✓ Færdig",
+        analyserar: "Analyserer", fel: "✗ Fejl", kvotSlut: "⚠ Månedlig grænse nået. Opgrader din plan eller køb ekstra kreditter.", avbruten: "✗ Afbrudt", klar: "✓ Færdig", tecken: "tegn",
         exporteraChatt: "↓ Eksportér chat", exporterar: "⏳ Eksporterer...", exporterad: "✓ Eksporteret",
         lamnaSidan: "Forlad siden?", aktivaChattar: "Du har aktive chats — vil du eksportere historikken?",
         exporteraOchLamna: "Eksportér og forlad", lamnaAnda: "Forlad alligevel", avbryt: "Annullér",
@@ -183,6 +184,7 @@ const AR_CONTENT = {
         kvotSlut:          "⚠ Månadsgränsen är nådd. Uppgradera din plan eller köp till krediter.",
         avbruten:          "✗ Avbruten",
         klar:              "✓ Klar",
+        tecken:            "tecken",
         exporteraChatt:    "↓ Exportera chatt",
         exporterar:        "⏳ Exporterar...",
         exporterad:        "✓ Exporterad",
@@ -803,75 +805,159 @@ function visaTimeoutDialog(originalText) {
     });
 }
 
-function startAnnotering(text) {
+async function startAnnotering(text) {
     annoteringIgnoreras = false;
     clearTimeout(annoteringTimeoutId);
 
-    let sekunder = 0;
-    visaOverlayAnalyserar(0);
+    // Hämta config och token från background.js
+    const config = await new Promise(resolve => {
+        chrome.runtime.sendMessage({ type: "GET_ANNOTATE_CONFIG", text }, resolve);
+    });
 
-    const räknare = setInterval(() => {
-        sekunder++;
-        visaOverlayAnalyserar(sekunder);
-    }, 1000);
+    if (!config?.token) {
+        visaOverlayAnalyserar(0);
+        overlay.textContent = t.fel;
+        setTimeout(() => overlay.remove(), 2000);
+        return;
+    }
 
-    annoteringTimeoutId = setTimeout(() => visaTimeoutDialog(text), AR_TIMEOUT_MS);
+    // Visa streaming-dialog
+    const streamDialog = visaStreamDialog(text.length);
 
-    chrome.runtime.sendMessage(
-        { type: "ANNOTATE", text },
-        (response) => {
-            clearInterval(räknare);
-            clearTimeout(annoteringTimeoutId);
-            if (annoteringIgnoreras) return;
+    let accumulated = "";
 
-            if (!response?.result?.content?.[0]?.text) {
-                console.log("Inget svar att rita:", response?.error);
-                if (response?.error === "quota_exceeded") {
-                    overlay.textContent = t.kvotSlut || "⚠ Monthly limit reached.";
-                    setTimeout(() => overlay.remove(), 4000);
-                } else {
-                    overlay.textContent = t.fel;
-                    setTimeout(() => overlay.remove(), 2000);
-                }
-                return;
-            }
+    try {
+        const resp = await fetch("https://annotated-reader-backend.vercel.app/api/annotate-stream", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${config.token}`
+            },
+            body: JSON.stringify({ text, prompt: config.prompt, model: config.model, temperature: config.temperature })
+        });
 
-            let data;
-            try {
-                const ren = response.result.content[0].text
-                    .replace(/```json/g, "")
-                    .replace(/```/g, "")
-                    .trim();
-                data = JSON.parse(ren);
-            } catch (e) {
-                console.log("Kunde inte parsa JSON:", e);
-                return;
-            }
-
-            const kategorifarger = {};
-            data.kategorier.forEach((k) => {
-                kategorifarger[k.namn] = k.farg;
-            });
-
-            sammanfattning = data.sammanfattning || "";
-            kategorier = data.kategorier || [];
-            källText = text;
-
-            data.annoteringar
-                .sort((a, b) => b.text.length - a.text.length)
-                .forEach((a) => {
-                    alleAnnoteringar.push({ text: a.text, kategori: a.kategori, beskrivning: a.beskrivning, farg: kategorifarger[a.kategori] || "#ccc" });
-                    markeraFras(a.text, a.kategori, a.beskrivning, kategorifarger);
-                });
-            chrome.storage.session.set({ ar_annoteringar: alleAnnoteringar });
-
-            overlay.textContent = t.klar;
-            setTimeout(() => {
-                overlay.remove();
-                visaHelTextKnapp();
-            }, 2000);
+        if (resp.status === 401) {
+            streamDialog.stäng();
+            visaOverlayAnalyserar(0);
+            overlay.textContent = t.fel;
+            setTimeout(() => overlay.remove(), 2000);
+            return;
         }
-    );
+
+        if (resp.status === 429) {
+            streamDialog.stäng();
+            visaOverlayAnalyserar(0);
+            overlay.textContent = t.kvotSlut || "⚠ Monthly limit reached.";
+            setTimeout(() => overlay.remove(), 4000);
+            return;
+        }
+
+        const reader = resp.body.getReader();
+        const decoder = new TextDecoder();
+
+        while (true) {
+            if (annoteringIgnoreras) { reader.cancel(); break; }
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const raw = decoder.decode(value);
+            for (const line of raw.split("\n")) {
+                if (!line.startsWith("data: ")) continue;
+                try {
+                    const data = JSON.parse(line.slice(6));
+                    if (data.text) {
+                        accumulated += data.text;
+                        streamDialog.uppdatera(accumulated.length);
+                    }
+                } catch {}
+            }
+        }
+    } catch (err) {
+        console.error("Stream fel:", err);
+        streamDialog.stäng();
+        return;
+    }
+
+    streamDialog.stäng();
+    if (annoteringIgnoreras) return;
+
+    // Parsa JSON och rita annoteringar
+    let data;
+    try {
+        const ren = accumulated.replace(/```json/g, "").replace(/```/g, "").trim();
+        data = JSON.parse(ren);
+    } catch (e) {
+        console.log("Kunde inte parsa JSON:", e);
+        return;
+    }
+
+    const kategorifarger = {};
+    data.kategorier.forEach((k) => {
+        kategorifarger[k.namn] = k.farg;
+    });
+
+    sammanfattning = data.sammanfattning || "";
+    kategorier = data.kategorier || [];
+    källText = text;
+
+    data.annoteringar
+        .sort((a, b) => b.text.length - a.text.length)
+        .forEach((a) => {
+            alleAnnoteringar.push({ text: a.text, kategori: a.kategori, beskrivning: a.beskrivning, farg: kategorifarger[a.kategori] || "#ccc" });
+            markeraFras(a.text, a.kategori, a.beskrivning, kategorifarger);
+        });
+    chrome.storage.session.set({ ar_annoteringar: alleAnnoteringar });
+
+    visaOverlayAnalyserar(0);
+    overlay.textContent = t.klar;
+    setTimeout(() => {
+        overlay.remove();
+        visaHelTextKnapp();
+    }, 2000);
+}
+
+function visaStreamDialog(inputLength) {
+    const ESTIMERAD_MAX = 5000;
+    const dialog = document.createElement("div");
+    dialog.id = "ar-stream-dialog";
+    dialog.style.cssText = `
+        position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+        background: #1a1610; color: #f5f0e8;
+        padding: 16px 20px; border-radius: 10px;
+        min-width: 320px; max-width: 420px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+        z-index: 99998; font-family: sans-serif;
+        border: 1px solid #333;
+    `;
+    dialog.innerHTML = `
+        <div style="font-size:12px;opacity:0.7;margin-bottom:10px;">
+            ${t.analyserar} ${inputLength.toLocaleString()} ${t.tecken || "characters"}
+        </div>
+        <div style="background:#2a2218;border-radius:4px;height:6px;overflow:hidden;margin-bottom:8px;">
+            <div id="ar-stream-bar" style="height:100%;width:0%;background:#f0c040;transition:width 0.3s;border-radius:4px;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span id="ar-stream-chars" style="font-size:11px;opacity:0.5;">0 ${t.tecken || "chars"} received</span>
+            <button id="ar-stream-avbryt" style="padding:4px 12px;background:transparent;color:#f5f0e8;border:1px solid #444;border-radius:4px;cursor:pointer;font-size:11px;">${t.avbryt}</button>
+        </div>
+    `;
+    document.body.appendChild(dialog);
+
+    document.getElementById("ar-stream-avbryt").addEventListener("click", () => {
+        annoteringIgnoreras = true;
+        dialog.remove();
+    });
+
+    return {
+        uppdatera(mottagna) {
+            const procent = Math.min(95, (mottagna / ESTIMERAD_MAX) * 100);
+            const bar = document.getElementById("ar-stream-bar");
+            const chars = document.getElementById("ar-stream-chars");
+            if (bar) bar.style.width = procent + "%";
+            if (chars) chars.textContent = `${mottagna.toLocaleString()} ${t.tecken || "chars"} received`;
+        },
+        stäng() { document.getElementById("ar-stream-dialog")?.remove(); }
+    };
 }
 
 function rensaAnnoteringar() {
