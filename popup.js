@@ -230,7 +230,6 @@ function visaAuthState(user) {
         signInBtn.style.display   = "flex";
         inloggad.style.display    = "none";
         annotateBtn.style.display = "none";
-        document.getElementById("ord-sektion").style.display = "none";
     }
 }
 
