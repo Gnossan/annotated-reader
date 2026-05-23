@@ -51,8 +51,8 @@
             const x = Math.min(rect.right + 8, window.innerWidth - 280);
             const y = rect.bottom + 8;
 
-            // Visa laddnings-popup
-            visaPopup(x, y, text, "…");
+            // Visa laddnings-popup med studsande punkter
+            visaLaddPopup(x, y, text);
 
             const svar = await chrome.runtime.sendMessage({ type: "LOOKUP_WORD", word: text });
 
@@ -69,6 +69,37 @@
         lookupKnapp?.remove();
         lookupKnapp = null;
     });
+
+    function visaLaddPopup(x, y, word) {
+        document.getElementById("ar-lookup-popup")?.remove();
+        const popup = document.createElement("div");
+        popup.id = "ar-lookup-popup";
+        popup.style.cssText = `
+            position: fixed; left: ${x}px; top: ${y}px;
+            background: #1a1610; color: #f5f0e8;
+            padding: 12px 14px; border-radius: 8px;
+            font-family: sans-serif; font-size: 13px;
+            max-width: 260px; z-index: 2147483647;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+            line-height: 1.5; border: 1px solid #333;
+        `;
+        popup.innerHTML = `
+            <style>
+                @keyframes ar-studsa {
+                    0%, 80%, 100% { transform: translateY(0); opacity: 0.35; }
+                    40% { transform: translateY(-5px); opacity: 1; }
+                }
+                .ar-lp { display:inline-block; width:6px; height:6px; border-radius:50%;
+                    background:#f5f0e8; margin:0 2px;
+                    animation: ar-studsa 1.2s infinite ease-in-out; }
+                .ar-lp:nth-child(2) { animation-delay: 0.2s; }
+                .ar-lp:nth-child(3) { animation-delay: 0.4s; }
+            </style>
+            <div style="font-weight:600;margin-bottom:8px;">${word}</div>
+            <div><span class="ar-lp"></span><span class="ar-lp"></span><span class="ar-lp"></span></div>
+        `;
+        document.body.appendChild(popup);
+    }
 
     function visaPopup(x, y, word, definition) {
         document.getElementById("ar-lookup-popup")?.remove();
