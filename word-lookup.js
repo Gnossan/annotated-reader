@@ -70,6 +70,12 @@
         lookupKnapp = null;
     });
 
+    // Ta bort ?-knappen vid högerklick så annoteringskontextmenyn inte störs
+    document.addEventListener("contextmenu", () => {
+        lookupKnapp?.remove();
+        lookupKnapp = null;
+    });
+
     function visaLaddPopup(x, y, word) {
         document.getElementById("ar-lookup-popup")?.remove();
         const popup = document.createElement("div");
