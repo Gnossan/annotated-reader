@@ -322,7 +322,7 @@ function visaLegende(kategorier) {
         margin-bottom: 8px;
     `;
     legende.innerHTML = kategorier.map(k => `
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <div class="ar-legend-item" data-namn="${k.namn}" style="display:flex;align-items:center;gap:8px;margin-bottom:6px;cursor:pointer;padding:4px 6px;border-radius:4px;margin-left:-6px;">
             <div style="width:12px;height:12px;border-radius:3px;background:${k.farg};flex-shrink:0;"></div>
             <div>
                 <span style="font-weight:600;font-size:12px;">${k.namn}</span>
@@ -331,4 +331,23 @@ function visaLegende(kategorier) {
         </div>
     `).join("");
     container.appendChild(legende);
+
+    legende.querySelectorAll(".ar-legend-item").forEach(item => {
+        item.addEventListener("mouseenter", () => item.style.background = "rgba(255,255,255,0.07)");
+        item.addEventListener("mouseleave", () => item.style.background = "");
+        item.addEventListener("click", async () => {
+            const fraga = t.forklaraKategori(item.dataset.namn);
+            historik.push({ role: "user", content: fraga, silent: true });
+            await sparaHistorik();
+
+            const tänker = visaTänker();
+            const svar = await chrome.runtime.sendMessage({ type: "CHAT", systemprompt, historik });
+            tänker.remove();
+
+            const assistantText = tolkSvar(svar);
+            laggTillBubbla("assistant", assistantText);
+            historik.push({ role: "assistant", content: assistantText });
+            await sparaHistorik();
+        });
+    });
 }
