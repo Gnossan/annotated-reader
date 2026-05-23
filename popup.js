@@ -224,7 +224,6 @@ function visaAuthState(user) {
         signInBtn.style.display   = "none";
         inloggad.style.display    = "block";
         annotateBtn.style.display = "block";
-        document.getElementById("ord-sektion").style.display = "block";
         document.getElementById("user-name").textContent = user.name || user.email;
         if (user.photo) document.getElementById("user-photo").src = user.photo;
     } else {
@@ -272,30 +271,9 @@ function tillampaSprak(t) {
     modellVal.options[1].textContent = t.sonnet;
     modellVal.options[2].textContent = t.haiku;
 
-    document.getElementById("ord-btn").textContent = t.identifieraOrd;
-    const nivaVal = document.getElementById("niva-val");
-    (t.nivaer || ["Beginner","Intermediate","Advanced","Native speaker"]).forEach((namn, i) => {
-        if (nivaVal.options[i]) nivaVal.options[i].textContent = namn;
-    });
-
     uppdateraTempUI(modellVal.value, t);
 }
 
-
-// --- Identifiera svåra ord ---
-document.getElementById("ord-btn").addEventListener("click", () => {
-    const level = document.getElementById("niva-val").value;
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        // Spara nivå i storage så word-difficulty.js kan läsa den
-        chrome.storage.local.set({ arOrdNiva: level }, () => {
-            chrome.scripting.executeScript({
-                target: { tabId: tabs[0].id },
-                files: ["word-difficulty.js"]
-            });
-            window.close();
-        });
-    });
-});
 
 // --- Annotera ---
 document.getElementById("annotate-btn").addEventListener("click", () => {
