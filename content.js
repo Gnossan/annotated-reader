@@ -842,10 +842,32 @@ async function startAnnotering(text) {
         console.log("[AIuda] Status:", resp.status);
 
         if (resp.status === 401) {
+            // Försök förnya token och försök igen
+            const nyConfig = await new Promise(resolve => {
+                chrome.runtime.sendMessage({ type: "REFRESH_AND_GET_CONFIG", text }, resolve);
+            });
+            if (!nyConfig?.token) {
+                streamDialog.stäng();
+                visaOverlayAnalyserar(0);
+                overlay.textContent = t.fel;
+                setTimeout(() => overlay.remove(), 2000);
+                return;
+            }
+            config.token = nyConfig.token;
+            // Försök igen med ny token
+            const resp2 = await fetch("https://annotated-reader-backend.vercel.app/api/annotate-stream", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${config.token}` },
+                body: JSON.stringify({ text, prompt: config.prompt, model: config.model, temperature: config.temperature })
+            });
+            if (!resp2.ok) {
+                streamDialog.stäng();
+                return;
+            }
+            // Ersätt resp med resp2 – bryt ur och kör om
+            // (enklast: rekursivt kalla startAnnotering igen)
             streamDialog.stäng();
-            visaOverlayAnalyserar(0);
-            overlay.textContent = t.fel;
-            setTimeout(() => overlay.remove(), 2000);
+            startAnnotering(text);
             return;
         }
 

@@ -81,6 +81,19 @@ function loggaTokens(typ, usage) {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     console.log("Meddelande mottaget:", message.type);
 
+    if (message.type === "REFRESH_AND_GET_CONFIG") {
+        chrome.storage.local.get(["modell", "temperature", "lang"], async (result) => {
+            const modell = result.modell || "claude-opus-4-7";
+            const temperature = result.temperature ?? 1.0;
+            const lang = result.lang || "en";
+            const t = AR_LOCALES[lang] || AR_LOCALES.en;
+            const nyToken = await förnyaToken();
+            const token = nyToken || await hämtaToken();
+            sendResponse({ token, prompt: t.annoteringsPrompt(message.text), model: modell, temperature });
+        });
+        return true;
+    }
+
     if (message.type === "GET_ANNOTATE_CONFIG") {
         chrome.storage.local.get(["modell", "temperature", "lang"], async (result) => {
             const modell = result.modell || "claude-opus-4-7";
