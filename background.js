@@ -94,6 +94,37 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         return true;
     }
 
+    if (message.type === "LOOKUP_WORD") {
+        chrome.storage.local.get("lang", async ({ lang = "en" }) => {
+            const token = await hämtaToken();
+            if (!token) { sendResponse({ error: "not_logged_in" }); return; }
+
+            const LANG_NAMES = { en: "English", "en-GB": "English", sv: "Swedish", da: "Danish", no: "Norwegian", de: "German", fr: "French", es: "Spanish", it: "Italian" };
+            const targetLang = LANG_NAMES[lang] || "English";
+
+            const response = await fetchMedToken(
+                `${BACKEND}/api/chat`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        historik: [{ role: "user", content: `Define "${message.word}" in one concise dictionary-style sentence in ${targetLang}. No extra commentary, just the definition.` }],
+                        systemprompt: `You are a dictionary. Respond only with a single concise definition in ${targetLang}.`,
+                        model: "claude-haiku-4-5-20251001",
+                        temperature: 0.3
+                    })
+                },
+                token
+            );
+
+            if (!response.ok) { sendResponse({ error: "fetch_error" }); return; }
+            const data = await response.json();
+            const definition = data.result?.content?.[0]?.text?.trim() || "";
+            sendResponse({ definition });
+        });
+        return true;
+    }
+
     if (message.type === "ANALYZE_WORDS") {
         chrome.storage.local.get(null, async (result) => {
             const token = await hämtaToken();

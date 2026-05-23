@@ -243,4 +243,81 @@
             document.addEventListener("click", () => popup.remove(), { once: true });
         }, 0);
     }
+    // --- Manuell ordsökning vid textmarkering ---
+    let lookupKnapp = null;
+
+    document.addEventListener("mouseup", (e) => {
+        // Ta bort gammal knapp
+        lookupKnapp?.remove();
+        lookupKnapp = null;
+
+        const urval = window.getSelection();
+        if (!urval || urval.isCollapsed) return;
+        const text = urval.toString().trim();
+        if (!text || text.length > 60 || text.includes("\n")) return;
+
+        const range = urval.getRangeAt(0);
+        const rect = range.getBoundingClientRect();
+
+        const knapp = document.createElement("button");
+        knapp.textContent = "?";
+        knapp.style.cssText = `
+            position: fixed;
+            left: ${Math.min(rect.right + 6, window.innerWidth - 40)}px;
+            top: ${rect.top - 4}px;
+            background: #1a1610;
+            color: #f0c040;
+            border: 1px solid #f0c040;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            z-index: 99999;
+            padding: 0;
+            line-height: 1;
+            font-family: sans-serif;
+        `;
+        document.body.appendChild(knapp);
+        lookupKnapp = knapp;
+
+        knapp.addEventListener("mousedown", async (ev) => {
+            ev.preventDefault();
+            ev.stopPropagation();
+            knapp.remove();
+            lookupKnapp = null;
+
+            const x = rect.right + 6;
+            const y = rect.bottom + 6;
+
+            // Visa laddnings-popup
+            document.getElementById("ar-ord-popup")?.remove();
+            const laddPopup = document.createElement("div");
+            laddPopup.id = "ar-ord-popup";
+            laddPopup.style.cssText = `
+                position: fixed; left: ${x}px; top: ${y}px;
+                background: #1a1610; color: #f5f0e8;
+                padding: 10px 14px; border-radius: 8px;
+                font-family: sans-serif; font-size: 13px;
+                z-index: 99999; box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+                border: 1px solid #333; opacity: 0.8;
+            `;
+            laddPopup.textContent = "…";
+            document.body.appendChild(laddPopup);
+
+            const svar = await chrome.runtime.sendMessage({ type: "LOOKUP_WORD", word: text });
+            laddPopup.remove();
+
+            if (svar?.definition) {
+                visaOrdPopup(x - 12, y - 12, text, svar.definition);
+            }
+        });
+    });
+
+    // Ta bort knappen om man klickar någon annanstans
+    document.addEventListener("mousedown", () => {
+        lookupKnapp?.remove();
+        lookupKnapp = null;
+    });
 })();
