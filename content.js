@@ -582,7 +582,8 @@ function visaHelTextKnapp() {
         chrome.runtime.sendMessage({
             type: "OPEN_SIDEPANEL",
             fras: null,
-            markeringId: "ar_chat_hela_sidan",
+            markeringId: "ar_chat_" + (window.location.hostname + window.location.pathname)
+                .toLowerCase().replace(/[^a-z0-9åäö]/g, "_").replace(/_+/g, "_").slice(0, 60),
             helText: källText,
             kategori: "",
             beskrivning: "",

@@ -2,6 +2,7 @@ let historik = [];
 let systemprompt = "";
 let nuvarandeMarkeringId = null;
 let nuvarandeMeta = {};
+let nuvarandeErHelSida = false;
 let t = AR_LOCALES.en;
 
 chrome.storage.local.get(["lang", "tema", "fontSize"], ({ lang = "en", tema = "mörkt", fontSize = 13 }) => {
@@ -50,6 +51,7 @@ chrome.runtime.onMessage.addListener((message) => {
     nuvarandeMarkeringId = message.markeringId;
 
     if (message.helText) {
+        nuvarandeErHelSida = true;
         document.getElementById("sp-kategori").textContent = "";
         document.getElementById("sp-fras").textContent = t.chatOmSidan || "Chat about page";
         document.getElementById("sp-beskrivning").textContent = message.sammanfattning || "";
@@ -57,6 +59,7 @@ chrome.runtime.onMessage.addListener((message) => {
         nuvarandeMeta = { fras: t.chatOmSidan, kategori: "", beskrivning: "", sammanfattning: message.sammanfattning || "" };
         systemprompt = t.helTextSystemPrompt(message.helText, message.sammanfattning);
     } else {
+        nuvarandeErHelSida = false;
         document.getElementById("sp-kategori").textContent = message.kategori.replace("_", " ");
         document.getElementById("sp-fras").textContent = message.fras;
         document.getElementById("sp-beskrivning").textContent = message.beskrivning;
@@ -217,7 +220,7 @@ document.getElementById("exportera").addEventListener("click", async () => {
 });
 
 async function startaKonversation() {
-    const startfråga = nuvarandeMarkeringId === "ar_chat_hela_sidan" ? t.forklaraHela : t.forklaraSammanhang;
+    const startfråga = nuvarandeErHelSida ? t.forklaraHela : t.forklaraSammanhang;
     historik.push({ role: "user", content: startfråga, silent: true });
     await sparaHistorik();
 
