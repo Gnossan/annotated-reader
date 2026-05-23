@@ -65,6 +65,8 @@ const AR_LOCALES = {
         forklaraSammanhang: "Explain this in its context.",
         forklaraHela:       "Give me an overview of this text.",
         forklaraKategori:   (k) => `Summarize what this page says about "${k}".`,
+        identifieraOrd:     "Identify difficult words",
+        nivaer:             ["Beginner", "Intermediate", "Advanced", "Native speaker"],
 
         systemPrompt: (fras, kategori, beskrivning, sammanfattning) =>
             `You are a helpful guide for text the user is reading.
@@ -154,6 +156,8 @@ ${text}`,
         forklaraSammanhang: "Explain this in its context.",
         forklaraHela:       "Give me an overview of this text.",
         forklaraKategori:   (k) => `Summarize what this page says about "${k}".`,
+        identifieraOrd:     "Identify difficult words",
+        nivaer:             ["Beginner", "Intermediate", "Advanced", "Native speaker"],
 
         systemPrompt: (fras, kategori, beskrivning, sammanfattning) =>
             `You are a helpful guide for text the user is reading.
@@ -255,6 +259,8 @@ ${text}`,
         forklaraSammanhang: "Förklara detta i sitt sammanhang.",
         forklaraHela:       "Ge mig en överblick över den här texten.",
         forklaraKategori:   (k) => `Sammanfatta vad den här sidan säger om "${k}".`,
+        identifieraOrd:     "Identifiera svåra ord",
+        nivaer:             ["Nybörjare", "Medel", "Avancerad", "Modersmålstalare"],
 
         systemPrompt: (fras, kategori, beskrivning, sammanfattning) =>
             `Du är en hjälpsam guide för text som användaren läser.
@@ -318,6 +324,8 @@ ${text}`,
         chatOmSidan: "Chat sobre la página", forklaraSammanhang: "Explica esto en su contexto.",
         forklaraHela: "Dame una visión general de este texto.",
         forklaraKategori: (k) => `Resume lo que dice esta página sobre "${k}".`,
+        identifieraOrd: "Identificar palabras difíciles",
+        nivaer: ["Principiante", "Intermedio", "Avanzado", "Hablante nativo"],
         systemPrompt: (fras, kategori, beskrivning, sammanfattning) =>
             `Eres una guía útil para el texto que lee el usuario.\nEl texto trata sobre: ${sammanfattning}\nEl usuario ha marcado la frase "${fras}" en la categoría "${kategori}".\nDescripción: ${beskrivning}\nAyuda al usuario a explorar y comprender esta frase en su contexto.\nResponde siempre en español, independientemente del idioma del texto.`,
         helTextSystemPrompt: (text, sammanfattning) =>
@@ -346,6 +354,8 @@ ${text}`,
         chatOmSidan: "Chat sur la page", forklaraSammanhang: "Expliquez ceci dans son contexte.",
         forklaraHela: "Donnez-moi un aperçu de ce texte.",
         forklaraKategori: (k) => `Résumez ce que cette page dit sur "${k}".`,
+        identifieraOrd: "Identifier les mots difficiles",
+        nivaer: ["Débutant", "Intermédiaire", "Avancé", "Locuteur natif"],
         systemPrompt: (fras, kategori, beskrivning, sammanfattning) =>
             `Vous êtes un guide utile pour le texte que l'utilisateur lit.\nLe texte porte sur : ${sammanfattning}\nL'utilisateur a mis en évidence la phrase "${fras}" dans la catégorie "${kategori}".\nDescription : ${beskrivning}\nAidez l'utilisateur à explorer et comprendre cette phrase dans son contexte.\nRépondez toujours en français, quelle que soit la langue du texte.`,
         helTextSystemPrompt: (text, sammanfattning) =>
@@ -374,6 +384,8 @@ ${text}`,
         chatOmSidan: "Chat über die Seite", forklaraSammanhang: "Erklären Sie dies in seinem Kontext.",
         forklaraHela: "Geben Sie mir einen Überblick über diesen Text.",
         forklaraKategori: (k) => `Fassen Sie zusammen, was diese Seite über "${k}" sagt.`,
+        identifieraOrd: "Schwierige Wörter identifizieren",
+        nivaer: ["Anfänger", "Mittelstufe", "Fortgeschritten", "Muttersprachler"],
         systemPrompt: (fras, kategori, beskrivning, sammanfattning) =>
             `Sie sind ein hilfreicher Leitfaden für den Text, den der Benutzer liest.\nDer Text handelt von: ${sammanfattning}\nDer Benutzer hat den Ausdruck "${fras}" in der Kategorie "${kategori}" hervorgehoben.\nBeschreibung: ${beskrivning}\nHelfen Sie dem Benutzer, diesen Ausdruck in seinem Kontext zu erkunden und zu verstehen.\nAntworten Sie immer auf Deutsch, unabhängig von der Sprache des Textes.`,
         helTextSystemPrompt: (text, sammanfattning) =>
@@ -402,6 +414,8 @@ ${text}`,
         chatOmSidan: "Chat sulla pagina", forklaraSammanhang: "Spiega questo nel suo contesto.",
         forklaraHela: "Dammi una panoramica di questo testo.",
         forklaraKategori: (k) => `Riassumi cosa dice questa pagina su "${k}".`,
+        identifieraOrd: "Identificare parole difficili",
+        nivaer: ["Principiante", "Intermedio", "Avanzato", "Madrelingua"],
         systemPrompt: (fras, kategori, beskrivning, sammanfattning) =>
             `Sei una guida utile per il testo che l'utente sta leggendo.\nIl testo riguarda: ${sammanfattning}\nL'utente ha evidenziato la frase "${fras}" nella categoria "${kategori}".\nDescrizione: ${beskrivning}\nAiuta l'utente a esplorare e comprendere questa frase nel suo contesto.\nRispondi sempre in italiano, indipendentemente dalla lingua del testo.`,
         helTextSystemPrompt: (text, sammanfattning) =>
@@ -430,6 +444,8 @@ ${text}`,
         chatOmSidan: "Chat om siden", forklaraSammanhang: "Forklar dette i sin sammenheng.",
         forklaraHela: "Gi meg en oversikt over denne teksten.",
         forklaraKategori: (k) => `Oppsummer hva denne siden sier om "${k}".`,
+        identifieraOrd: "Identifiser vanskelige ord",
+        nivaer: ["Nybegynner", "Middels", "Avansert", "Morsmålsbruker"],
         systemPrompt: (fras, kategori, beskrivning, sammanfattning) =>
             `Du er en nyttig guide for teksten brukeren leser.\nTeksten handler om: ${sammanfattning}\nBrukeren har markert frasen "${fras}" i kategorien "${kategori}".\nBeskrivelse: ${beskrivning}\nHjelp brukeren med å utforske og forstå denne frasen i sin sammenheng.\nSvar alltid på norsk, uavhengig av tekstens språk.`,
         helTextSystemPrompt: (text, sammanfattning) =>
@@ -458,6 +474,8 @@ ${text}`,
         chatOmSidan: "Chat om siden", forklaraSammanhang: "Forklar dette i sin sammenhæng.",
         forklaraHela: "Giv mig et overblik over denne tekst.",
         forklaraKategori: (k) => `Opsummer hvad denne side siger om "${k}".`,
+        identifieraOrd: "Identificer svære ord",
+        nivaer: ["Begynder", "Mellemniveau", "Avanceret", "Modersmålsbruger"],
         systemPrompt: (fras, kategori, beskrivning, sammanfattning) =>
             `Du er en nyttig guide til den tekst, brugeren læser.\nTeksten handler om: ${sammanfattning}\nBrugeren har markeret frasen "${fras}" i kategorien "${kategori}".\nBeskrivelse: ${beskrivning}\nHjælp brugeren med at udforske og forstå denne frase i dens sammenhæng.\nSvar altid på dansk, uanset tekstens sprog.`,
         helTextSystemPrompt: (text, sammanfattning) =>

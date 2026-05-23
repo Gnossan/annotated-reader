@@ -94,6 +94,36 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         return true;
     }
 
+    if (message.type === "ANALYZE_WORDS") {
+        chrome.storage.local.get(null, async (result) => {
+            const token = await hämtaToken();
+            if (!token) { sendResponse({ error: "not_logged_in" }); return; }
+
+            const response = await fetchMedToken(
+                `${BACKEND}/api/word-difficulty`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        text: message.text,
+                        level: message.level,
+                        lang: result.lang || "en"
+                    })
+                },
+                token
+            );
+
+            if (response.status === 429) {
+                const errData = await response.json().catch(() => ({}));
+                sendResponse({ error: "quota_exceeded", plan: errData.plan });
+                return;
+            }
+            const data = await response.json();
+            sendResponse({ words: data.words, error: data.error });
+        });
+        return true;
+    }
+
     if (message.type === "GET_ANNOTATE_CONFIG") {
         chrome.storage.local.get(["modell", "temperature", "lang"], async (result) => {
             const modell = result.modell || "claude-opus-4-7";

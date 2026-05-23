@@ -224,12 +224,14 @@ function visaAuthState(user) {
         signInBtn.style.display   = "none";
         inloggad.style.display    = "block";
         annotateBtn.style.display = "block";
+        document.getElementById("ord-sektion").style.display = "block";
         document.getElementById("user-name").textContent = user.name || user.email;
         if (user.photo) document.getElementById("user-photo").src = user.photo;
     } else {
         signInBtn.style.display   = "flex";
         inloggad.style.display    = "none";
         annotateBtn.style.display = "none";
+        document.getElementById("ord-sektion").style.display = "none";
     }
 }
 
@@ -270,9 +272,33 @@ function tillampaSprak(t) {
     modellVal.options[1].textContent = t.sonnet;
     modellVal.options[2].textContent = t.haiku;
 
+    document.getElementById("ord-btn").textContent = t.identifieraOrd;
+    const nivaVal = document.getElementById("niva-val");
+    (t.nivaer || ["Beginner","Intermediate","Advanced","Native speaker"]).forEach((namn, i) => {
+        if (nivaVal.options[i]) nivaVal.options[i].textContent = namn;
+    });
+
     uppdateraTempUI(modellVal.value, t);
 }
 
+
+// --- Identifiera svåra ord ---
+document.getElementById("ord-btn").addEventListener("click", () => {
+    const level = document.getElementById("niva-val").value;
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        chrome.scripting.executeScript({
+            target: { tabId: tabs[0].id },
+            func: (level) => { window.__arOrdNiva = level; },
+            args: [level]
+        }, () => {
+            chrome.scripting.executeScript({
+                target: { tabId: tabs[0].id },
+                files: ["word-difficulty.js"]
+            });
+        });
+        window.close();
+    });
+});
 
 // --- Annotera ---
 document.getElementById("annotate-btn").addEventListener("click", () => {
