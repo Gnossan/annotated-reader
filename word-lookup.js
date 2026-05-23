@@ -3,7 +3,21 @@
 // och visar en ?-knapp. Endast det markerade ordet skickas till Claude.
 
 (function () {
+    const DAGSGRANS_MEDDELANDEN = {
+        en:      "You've reached your free daily limit (20 lookups). Sign in to AIuda Reader for unlimited access.",
+        "en-GB": "You've reached your free daily limit (20 lookups). Sign in to AIuda Reader for unlimited access.",
+        sv:      "Du har nått din gratis dagsgräns (20 uppslagningar). Logga in på AIuda Reader för obegränsad åtkomst.",
+        da:      "Du har nået din gratis daglige grænse (20 opslag). Log ind på AIuda Reader for ubegrænset adgang.",
+        no:      "Du har nådd din gratis dagsgrense (20 oppslag). Logg inn på AIuda Reader for ubegrenset tilgang.",
+        de:      "Sie haben Ihr kostenloses Tageslimit erreicht (20 Nachschläge). Melden Sie sich bei AIuda Reader an für unbegrenzten Zugang.",
+        fr:      "Vous avez atteint votre limite quotidienne gratuite (20 recherches). Connectez-vous à AIuda Reader pour un accès illimité.",
+        es:      "Has alcanzado tu límite diario gratuito (20 búsquedas). Inicia sesión en AIuda Reader para acceso ilimitado.",
+        it:      "Hai raggiunto il limite giornaliero gratuito (20 ricerche). Accedi ad AIuda Reader per un accesso illimitato.",
+    };
+
     let lookupKnapp = null;
+    let currentLang = "en";
+    chrome.storage.local.get("lang", ({ lang = "en" }) => { currentLang = lang; });
 
     document.addEventListener("mouseup", (e) => {
         if (e.target === lookupKnapp) return;
@@ -59,7 +73,7 @@
             if (svar?.definition) {
                 visaPopup(x, y, text, svar.definition);
             } else if (svar?.error === "daily_limit") {
-                visaPopup(x, y, text, "You've reached your free daily limit (20 lookups). Sign in to AIuda Reader for unlimited access.");
+                visaPopup(x, y, text, DAGSGRANS_MEDDELANDEN[currentLang] || DAGSGRANS_MEDDELANDEN.en);
             } else {
                 document.getElementById("ar-lookup-popup")?.remove();
             }
