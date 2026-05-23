@@ -97,30 +97,47 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === "LOOKUP_WORD") {
         chrome.storage.local.get("lang", async ({ lang = "en" }) => {
             const token = await hämtaToken();
-            if (!token) { sendResponse({ error: "not_logged_in" }); return; }
 
-            const LANG_NAMES = { en: "English", "en-GB": "English", sv: "Swedish", da: "Danish", no: "Norwegian", de: "German", fr: "French", es: "Spanish", it: "Italian" };
-            const targetLang = LANG_NAMES[lang] || "English";
-
-            const response = await fetchMedToken(
-                `${BACKEND}/api/chat`,
-                {
+            let response;
+            if (token) {
+                // Inloggad — använd autentiserad chat-endpoint
+                const LANG_NAMES = { en: "English", "en-GB": "English", sv: "Swedish", da: "Danish", no: "Norwegian", de: "German", fr: "French", es: "Spanish", it: "Italian" };
+                const targetLang = LANG_NAMES[lang] || "English";
+                response = await fetchMedToken(
+                    `${BACKEND}/api/chat`,
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            historik: [{ role: "user", content: `Define "${message.word}" in one concise dictionary-style sentence in ${targetLang}. No extra commentary, just the definition.` }],
+                            systemprompt: `You are a dictionary. Respond only with a single concise definition in ${targetLang}.`,
+                            model: "claude-haiku-4-5-20251001",
+                            temperature: 0.3
+                        })
+                    },
+                    token
+                );
+                if (!response.ok) { sendResponse({ error: "fetch_error" }); return; }
+                const data = await response.json();
+                sendResponse({ definition: data.result?.content?.[0]?.text?.trim() || "" });
+            } else {
+                // Anonym — gratis-endpoint med extension-ID och dagsgräns
+                response = await fetch(`${BACKEND}/api/word-lookup-free`, {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        historik: [{ role: "user", content: `Define "${message.word}" in one concise dictionary-style sentence in ${targetLang}. No extra commentary, just the definition.` }],
-                        systemprompt: `You are a dictionary. Respond only with a single concise definition in ${targetLang}.`,
-                        model: "claude-haiku-4-5-20251001",
-                        temperature: 0.3
-                    })
-                },
-                token
-            );
-
-            if (!response.ok) { sendResponse({ error: "fetch_error" }); return; }
-            const data = await response.json();
-            const definition = data.result?.content?.[0]?.text?.trim() || "";
-            sendResponse({ definition });
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-Extension-Id": chrome.runtime.id
+                    },
+                    body: JSON.stringify({ word: message.word, lang })
+                });
+                if (response.status === 429) {
+                    sendResponse({ error: "daily_limit" });
+                    return;
+                }
+                if (!response.ok) { sendResponse({ error: "fetch_error" }); return; }
+                const data = await response.json();
+                sendResponse({ definition: data.definition || "" });
+            }
         });
         return true;
     }

@@ -58,6 +58,8 @@
 
             if (svar?.definition) {
                 visaPopup(x, y, text, svar.definition);
+            } else if (svar?.error === "daily_limit") {
+                visaPopup(x, y, text, "You've reached your free daily limit (20 lookups). Sign in to AIuda Reader for unlimited access.");
             } else {
                 document.getElementById("ar-lookup-popup")?.remove();
             }
