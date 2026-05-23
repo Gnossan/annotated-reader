@@ -241,6 +241,69 @@ chrome.tabs.onActivated.addListener(async ({ tabId }) => {
     }
 });
 
+// --- Streaming-ordanalys via port ---
+chrome.runtime.onConnect.addListener((port) => {
+    if (port.name !== "word-difficulty-stream") return;
+
+    let cancelled = false;
+    port.onDisconnect.addListener(() => { cancelled = true; });
+
+    port.onMessage.addListener(async ({ text, level, lang }) => {
+        let token = await hämtaToken();
+        if (!token) {
+            if (!cancelled) port.postMessage({ error: "not_logged_in" });
+            return;
+        }
+
+        const doFetch = async (tok) => fetch(`${BACKEND}/api/word-difficulty-stream`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${tok}` },
+            body: JSON.stringify({ text, level, lang })
+        });
+
+        let resp = await doFetch(token);
+        if (resp.status === 401) {
+            const nyToken = await förnyaToken();
+            if (nyToken) { token = nyToken; resp = await doFetch(token); }
+        }
+
+        if (!resp.ok) {
+            if (!cancelled) port.postMessage({ error: resp.status === 429 ? "quota_exceeded" : "fetch_error" });
+            return;
+        }
+
+        const reader = resp.body.getReader();
+        const decoder = new TextDecoder();
+        let sseBuffer = "";
+        const keepAlive = setInterval(() => chrome.storage.local.get("_keepAlive"), 20000);
+
+        try {
+            while (true) {
+                if (cancelled) { reader.cancel(); return; }
+                const { done, value } = await reader.read();
+                if (done) break;
+                sseBuffer += decoder.decode(value, { stream: true });
+                const lines = sseBuffer.split("\n");
+                sseBuffer = lines.pop();
+                for (const line of lines) {
+                    if (!line.startsWith("data: ")) continue;
+                    try {
+                        const data = JSON.parse(line.slice(6));
+                        if (data.text) port.postMessage({ chunk: data.text });
+                        if (data.done) { port.postMessage({ done: true }); return; }
+                        if (data.error) { port.postMessage({ error: data.error }); return; }
+                    } catch {}
+                }
+            }
+            if (!cancelled) port.postMessage({ done: true });
+        } catch (e) {
+            if (!cancelled) port.postMessage({ error: "stream_error" });
+        } finally {
+            clearInterval(keepAlive);
+        }
+    });
+});
+
 // --- Streaming-annotering via port (undviker content-scriptets 30s-timeout) ---
 chrome.runtime.onConnect.addListener((port) => {
     if (port.name !== "annotate-stream") return;
