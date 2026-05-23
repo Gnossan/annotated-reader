@@ -952,7 +952,7 @@ async function startAnnotering(text) {
 }
 
 function visaStreamDialog(inputLength) {
-    const ESTIMERAD_MAX = 5000;
+    const ESTIMERAD_MAX = Math.max(6000, Math.round(inputLength * 0.6));
     const dialog = document.createElement("div");
     dialog.id = "ar-stream-dialog";
     dialog.style.cssText = `
