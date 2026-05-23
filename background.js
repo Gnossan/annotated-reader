@@ -191,12 +191,23 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             kategorier: message.kategorier,
             helText: message.helText
         };
+        // Spara kontext per flik för automatiskt byte vid flikbyte
+        chrome.storage.session.set({ [`ar_tab_${sender.tab.id}`]: kontext });
         chrome.sidePanel.open({ windowId: sender.tab.windowId });
         setTimeout(() => {
             chrome.runtime.sendMessage({ type: "OPEN_PANEL", ...kontext });
         }, 500);
         sendResponse({});
         return true;
+    }
+});
+
+// --- Automatiskt sidopanelsbyte vid flikbyte ---
+chrome.tabs.onActivated.addListener(async ({ tabId }) => {
+    const key = `ar_tab_${tabId}`;
+    const stored = await chrome.storage.session.get(key);
+    if (stored[key]) {
+        chrome.runtime.sendMessage({ type: "OPEN_PANEL", ...stored[key] });
     }
 });
 
