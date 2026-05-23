@@ -286,17 +286,14 @@ function tillampaSprak(t) {
 document.getElementById("ord-btn").addEventListener("click", () => {
     const level = document.getElementById("niva-val").value;
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        chrome.scripting.executeScript({
-            target: { tabId: tabs[0].id },
-            func: (level) => { window.__arOrdNiva = level; },
-            args: [level]
-        }, () => {
+        // Spara nivå i storage så word-difficulty.js kan läsa den
+        chrome.storage.local.set({ arOrdNiva: level }, () => {
             chrome.scripting.executeScript({
                 target: { tabId: tabs[0].id },
                 files: ["word-difficulty.js"]
             });
+            window.close();
         });
-        window.close();
     });
 });
 

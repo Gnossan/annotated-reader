@@ -14,9 +14,9 @@
         it:      { laddning: "Identificazione delle parole difficili…", klar: (n) => `${n} parole identificate`, fel: "✗ Errore", inga: "Nessuna parola difficile trovata", kvotSlut: "⚠ Limite mensile raggiunto" },
     };
 
-    chrome.storage.local.get("lang", async ({ lang = "en" }) => {
+    chrome.storage.local.get(["lang", "arOrdNiva"], async ({ lang = "en", arOrdNiva = "intermediate" }) => {
         const wt = WD_LOCALES[lang] || WD_LOCALES.en;
-        const level = window.__arOrdNiva || "intermediate";
+        const level = arOrdNiva;
 
         // Visa laddningsindikator
         const overlayEl = visaStatusOverlay(wt.laddning);
