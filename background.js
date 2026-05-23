@@ -199,3 +199,75 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         return true;
     }
 });
+
+// --- Streaming-annotering via port (undviker content-scriptets 30s-timeout) ---
+chrome.runtime.onConnect.addListener((port) => {
+    if (port.name !== "annotate-stream") return;
+
+    let cancelled = false;
+    port.onDisconnect.addListener(() => { cancelled = true; });
+
+    port.onMessage.addListener(async ({ text }) => {
+        const result = await chrome.storage.local.get(["modell", "temperature", "lang"]);
+        const modell = result.modell || "claude-opus-4-7";
+        const temperature = result.temperature ?? 1.0;
+        const lang = result.lang || "en";
+        const t = AR_LOCALES[lang] || AR_LOCALES.en;
+
+        let token = await hämtaToken();
+        if (!token) {
+            if (!cancelled) port.postMessage({ error: "not_logged_in" });
+            return;
+        }
+
+        const doFetch = async (tok) => fetch(`${BACKEND}/api/annotate-stream`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${tok}` },
+            body: JSON.stringify({ text, prompt: t.annoteringsPrompt(text), model: modell, temperature })
+        });
+
+        let resp = await doFetch(token);
+        if (resp.status === 401) {
+            const nyToken = await förnyaToken();
+            if (nyToken) { token = nyToken; resp = await doFetch(token); }
+        }
+
+        if (!resp.ok) {
+            if (!cancelled) port.postMessage({ error: resp.status === 429 ? "quota_exceeded" : "fetch_error" });
+            return;
+        }
+
+        const reader = resp.body.getReader();
+        const decoder = new TextDecoder();
+        let sseBuffer = "";
+
+        // Håll service workern vid liv under hela streamen (MV3 dödar annars SW efter ~30s)
+        const keepAlive = setInterval(() => chrome.storage.local.get("_keepAlive"), 20000);
+
+        try {
+            while (true) {
+                if (cancelled) { reader.cancel(); return; }
+                const { done, value } = await reader.read();
+                if (done) break;
+                sseBuffer += decoder.decode(value, { stream: true });
+                const lines = sseBuffer.split("\n");
+                sseBuffer = lines.pop();
+                for (const line of lines) {
+                    if (!line.startsWith("data: ")) continue;
+                    try {
+                        const data = JSON.parse(line.slice(6));
+                        if (data.text) port.postMessage({ chunk: data.text });
+                        if (data.done) { port.postMessage({ done: true }); return; }
+                        if (data.error) { port.postMessage({ error: data.error }); return; }
+                    } catch {}
+                }
+            }
+            if (!cancelled) port.postMessage({ done: true });
+        } catch (e) {
+            console.error("annotate-stream port fel:", e.message);
+            if (!cancelled) port.postMessage({ error: "stream_error" });
+        } finally {
+            clearInterval(keepAlive);
+        }
+    });
+});

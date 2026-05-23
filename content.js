@@ -809,109 +809,63 @@ async function startAnnotering(text) {
     annoteringIgnoreras = false;
     clearTimeout(annoteringTimeoutId);
 
-    // Hämta config och token från background.js
-    const config = await new Promise(resolve => {
-        chrome.runtime.sendMessage({ type: "GET_ANNOTATE_CONFIG", text }, resolve);
-    });
-    console.log("[AIuda] GET_ANNOTATE_CONFIG:", config ? "OK" : "SAKNAS");
+    let accumulated = "";
+    let streamFel = null;
+    let avbrytPort = null;
 
-    if (!config?.token) {
-        visaOverlayAnalyserar(0);
-        overlay.textContent = t.fel;
+    // Visa streaming-dialog med avbryt-callback som kopplar ned porten
+    const streamDialog = visaStreamDialog(text.length, () => {
+        annoteringIgnoreras = true;
+        if (avbrytPort) avbrytPort.disconnect();
+    });
+
+    // Streaming sker i service workern (ingen 30s-timeout där)
+    await new Promise((resolve) => {
+        const port = chrome.runtime.connect({ name: "annotate-stream" });
+        avbrytPort = port;
+        port.postMessage({ text });
+
+        port.onMessage.addListener((msg) => {
+            if (msg.chunk) {
+                accumulated += msg.chunk;
+                streamDialog.uppdatera(accumulated.length);
+            }
+            if (msg.error) {
+                streamFel = msg.error;
+                port.disconnect();
+                resolve();
+                return;
+            }
+            if (msg.done) {
+                port.disconnect();
+                resolve();
+            }
+        });
+
+        // Säkerhetsnät: om porten stängs av annan anledning
+        port.onDisconnect.addListener(() => resolve());
+    });
+
+    streamDialog.stäng();
+    avbrytPort = null;
+
+    if (annoteringIgnoreras) {
+        overlay.textContent = t.avbruten;
         setTimeout(() => overlay.remove(), 2000);
         return;
     }
 
-    // Visa streaming-dialog
-    const streamDialog = visaStreamDialog(text.length);
-
-    let accumulated = "";
-    let sseBuffer = "";
-
-    try {
-        console.log("[AIuda] Startar streaming fetch...");
-        const resp = await fetch("https://annotated-reader-backend.vercel.app/api/annotate-stream", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${config.token}`
-            },
-            body: JSON.stringify({ text, prompt: config.prompt, model: config.model, temperature: config.temperature })
-        });
-
-        console.log("[AIuda] Status:", resp.status);
-
-        if (resp.status === 401) {
-            // Försök förnya token och försök igen
-            const nyConfig = await new Promise(resolve => {
-                chrome.runtime.sendMessage({ type: "REFRESH_AND_GET_CONFIG", text }, resolve);
-            });
-            if (!nyConfig?.token) {
-                streamDialog.stäng();
-                visaOverlayAnalyserar(0);
-                overlay.textContent = t.fel;
-                setTimeout(() => overlay.remove(), 2000);
-                return;
-            }
-            config.token = nyConfig.token;
-            // Försök igen med ny token
-            const resp2 = await fetch("https://annotated-reader-backend.vercel.app/api/annotate-stream", {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${config.token}` },
-                body: JSON.stringify({ text, prompt: config.prompt, model: config.model, temperature: config.temperature })
-            });
-            if (!resp2.ok) {
-                streamDialog.stäng();
-                return;
-            }
-            // Ersätt resp med resp2 – bryt ur och kör om
-            // (enklast: rekursivt kalla startAnnotering igen)
-            streamDialog.stäng();
-            startAnnotering(text);
-            return;
-        }
-
-        if (resp.status === 429) {
-            streamDialog.stäng();
-            visaOverlayAnalyserar(0);
-            overlay.textContent = t.kvotSlut || "⚠ Monthly limit reached.";
-            setTimeout(() => overlay.remove(), 4000);
-            return;
-        }
-
-        const reader = resp.body.getReader();
-        const decoder = new TextDecoder();
-
-        while (true) {
-            if (annoteringIgnoreras) { reader.cancel(); break; }
-            const { done, value } = await reader.read();
-            if (done) break;
-
-            sseBuffer += decoder.decode(value, { stream: true });
-            const lines = sseBuffer.split("\n");
-            sseBuffer = lines.pop(); // behåll ofullständig rad
-
-            for (const line of lines) {
-                if (!line.startsWith("data: ")) continue;
-                try {
-                    const data = JSON.parse(line.slice(6));
-                    if (data.text) {
-                        accumulated += data.text;
-                        streamDialog.uppdatera(accumulated.length);
-                    }
-                    if (data.error) console.error("[AIuda] Stream error:", data.error);
-                } catch {}
-            }
-        }
-        console.log("[AIuda] Stream klar, tecken:", accumulated.length);
-    } catch (err) {
-        console.error("[AIuda] Stream fetch fel:", err);
-        streamDialog.stäng();
+    if (streamFel === "quota_exceeded") {
+        overlay.textContent = t.kvotSlut;
+        setTimeout(() => overlay.remove(), 4000);
         return;
     }
 
-    streamDialog.stäng();
-    if (annoteringIgnoreras) return;
+    if (streamFel || accumulated.length === 0) {
+        overlay.textContent = t.fel;
+        setTimeout(() => overlay.remove(), 2000);
+        return;
+    }
 
     // Parsa JSON och rita annoteringar
     console.log("[AIuda] Ackumulerat:", accumulated.length, "tecken");
@@ -923,6 +877,8 @@ async function startAnnotering(text) {
         data = JSON.parse(ren);
     } catch (e) {
         console.error("[AIuda] JSON-parsning misslyckades:", e.message);
+        overlay.textContent = t.fel;
+        setTimeout(() => overlay.remove(), 2000);
         return;
     }
 
@@ -943,7 +899,6 @@ async function startAnnotering(text) {
         });
     chrome.storage.session.set({ ar_annoteringar: alleAnnoteringar });
 
-    visaOverlayAnalyserar(0);
     overlay.textContent = t.klar;
     setTimeout(() => {
         overlay.remove();
@@ -951,7 +906,7 @@ async function startAnnotering(text) {
     }, 2000);
 }
 
-function visaStreamDialog(inputLength) {
+function visaStreamDialog(inputLength, onAvbryt) {
     const ESTIMERAD_MAX = Math.max(6000, Math.round(inputLength * 0.6));
     const dialog = document.createElement("div");
     dialog.id = "ar-stream-dialog";
@@ -979,8 +934,8 @@ function visaStreamDialog(inputLength) {
     document.body.appendChild(dialog);
 
     document.getElementById("ar-stream-avbryt").addEventListener("click", () => {
-        annoteringIgnoreras = true;
         dialog.remove();
+        if (onAvbryt) onAvbryt();
     });
 
     return {
