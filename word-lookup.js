@@ -92,6 +92,67 @@
         lookupKnapp = null;
     });
 
+    // 🥕 Easter egg — Konami-kod ersätter Trump-bilder med morötter
+    const KONAMI = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown",
+                    "ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];
+    let konamiPos = 0;
+
+    function morotDataUri() {
+        const canvas = document.createElement("canvas");
+        canvas.width = canvas.height = 200;
+        const ctx = canvas.getContext("2d");
+        ctx.fillStyle = "#f5f5f5";
+        ctx.fillRect(0, 0, 200, 200);
+        ctx.font = "120px serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("🥕", 100, 110);
+        return canvas.toDataURL();
+    }
+
+    function ärTrumpBild(img) {
+        const sökord = ["trump", "donald"];
+        const text = [
+            img.alt, img.title, img.src,
+            img.closest("a")?.href || "",
+            img.parentElement?.textContent || ""
+        ].join(" ").toLowerCase();
+        return sökord.some(s => text.includes(s));
+    }
+
+    document.addEventListener("keydown", (e) => {
+        if (e.key === KONAMI[konamiPos]) {
+            konamiPos++;
+            if (konamiPos === KONAMI.length) {
+                konamiPos = 0;
+                const morot = morotDataUri();
+                let antal = 0;
+                document.querySelectorAll("img").forEach(img => {
+                    if (ärTrumpBild(img)) {
+                        img.src = morot;
+                        img.alt = "🥕";
+                        img.style.objectFit = "contain";
+                        antal++;
+                    }
+                });
+                if (antal > 0) {
+                    const toast = document.createElement("div");
+                    toast.textContent = `🥕 ${antal} morot${antal > 1 ? "er" : ""} serverad${antal > 1 ? "e" : ""}`;
+                    toast.style.cssText = `
+                        position:fixed;bottom:30px;left:50%;transform:translateX(-50%);
+                        background:#1a1610;color:#f5f0e8;padding:10px 20px;
+                        border-radius:20px;font-family:sans-serif;font-size:14px;
+                        z-index:2147483647;box-shadow:0 4px 12px rgba(0,0,0,0.4);
+                    `;
+                    document.body.appendChild(toast);
+                    setTimeout(() => toast.remove(), 3000);
+                }
+            }
+        } else {
+            konamiPos = e.key === KONAMI[0] ? 1 : 0;
+        }
+    });
+
     function visaLaddPopup(x, y, word) {
         document.getElementById("ar-lookup-popup")?.remove();
         const popup = document.createElement("div");
