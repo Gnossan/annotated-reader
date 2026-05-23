@@ -914,12 +914,15 @@ async function startAnnotering(text) {
     if (annoteringIgnoreras) return;
 
     // Parsa JSON och rita annoteringar
+    console.log("[AIuda] Ackumulerat:", accumulated.length, "tecken");
+    console.log("[AIuda] Första 200:", accumulated.slice(0, 200));
+    console.log("[AIuda] Sista 200:", accumulated.slice(-200));
     let data;
     try {
         const ren = accumulated.replace(/```json/g, "").replace(/```/g, "").trim();
         data = JSON.parse(ren);
     } catch (e) {
-        console.log("Kunde inte parsa JSON:", e);
+        console.error("[AIuda] JSON-parsning misslyckades:", e.message);
         return;
     }
 
