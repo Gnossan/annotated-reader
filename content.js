@@ -813,6 +813,7 @@ async function startAnnotering(text) {
     const config = await new Promise(resolve => {
         chrome.runtime.sendMessage({ type: "GET_ANNOTATE_CONFIG", text }, resolve);
     });
+    console.log("[AIuda] GET_ANNOTATE_CONFIG:", config ? "OK" : "SAKNAS");
 
     if (!config?.token) {
         visaOverlayAnalyserar(0);
@@ -825,8 +826,10 @@ async function startAnnotering(text) {
     const streamDialog = visaStreamDialog(text.length);
 
     let accumulated = "";
+    let sseBuffer = "";
 
     try {
+        console.log("[AIuda] Startar streaming fetch...");
         const resp = await fetch("https://annotated-reader-backend.vercel.app/api/annotate-stream", {
             method: "POST",
             headers: {
@@ -835,6 +838,8 @@ async function startAnnotering(text) {
             },
             body: JSON.stringify({ text, prompt: config.prompt, model: config.model, temperature: config.temperature })
         });
+
+        console.log("[AIuda] Status:", resp.status);
 
         if (resp.status === 401) {
             streamDialog.stäng();
@@ -860,8 +865,11 @@ async function startAnnotering(text) {
             const { done, value } = await reader.read();
             if (done) break;
 
-            const raw = decoder.decode(value);
-            for (const line of raw.split("\n")) {
+            sseBuffer += decoder.decode(value, { stream: true });
+            const lines = sseBuffer.split("\n");
+            sseBuffer = lines.pop(); // behåll ofullständig rad
+
+            for (const line of lines) {
                 if (!line.startsWith("data: ")) continue;
                 try {
                     const data = JSON.parse(line.slice(6));
@@ -869,11 +877,13 @@ async function startAnnotering(text) {
                         accumulated += data.text;
                         streamDialog.uppdatera(accumulated.length);
                     }
+                    if (data.error) console.error("[AIuda] Stream error:", data.error);
                 } catch {}
             }
         }
+        console.log("[AIuda] Stream klar, tecken:", accumulated.length);
     } catch (err) {
-        console.error("Stream fel:", err);
+        console.error("[AIuda] Stream fetch fel:", err);
         streamDialog.stäng();
         return;
     }
