@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "AIuda Reader (dev)",
-    "version": "0.9.8",
+    "version": "0.9.9",
     "description": "Annoterar webbtext via Claude API",
     "action": {
         "default_popup": "popup.html",

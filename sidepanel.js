@@ -313,14 +313,10 @@ function laggTillBubbla(roll, text, skrolla = true) {
 }
 
 function visaLegende(kategorier) {
+    const legendeEl = document.getElementById("legende");
+    legendeEl.innerHTML = "";
     if (kategorier.length === 0) return;
-    const container = document.getElementById("meddelanden");
     const legende = document.createElement("div");
-    legende.style.cssText = `
-        padding: 8px 0;
-        border-bottom: 1px solid #333;
-        margin-bottom: 8px;
-    `;
     legende.innerHTML = kategorier.map(k => `
         <div class="ar-legend-item" data-namn="${k.namn}" style="display:flex;align-items:center;gap:8px;margin-bottom:6px;cursor:pointer;padding:4px 6px;border-radius:4px;margin-left:-6px;">
             <div style="width:12px;height:12px;border-radius:3px;background:${k.farg};flex-shrink:0;"></div>
@@ -330,7 +326,7 @@ function visaLegende(kategorier) {
             </div>
         </div>
     `).join("");
-    container.appendChild(legende);
+    legendeEl.appendChild(legende);
 
     legende.querySelectorAll(".ar-legend-item").forEach(item => {
         item.addEventListener("mouseenter", () => item.style.background = "rgba(255,255,255,0.07)");

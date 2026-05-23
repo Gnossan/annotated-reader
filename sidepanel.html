@@ -89,6 +89,16 @@
             letter-spacing: 0.08em;
         }
 
+        #legende {
+            padding: 8px 16px;
+            border-bottom: 1px solid #333;
+            flex-shrink: 0;
+        }
+
+        #legende:empty {
+            display: none;
+        }
+
         #meddelanden {
             flex: 1;
             overflow-y: auto;
@@ -189,6 +199,10 @@
             background: #2a2218;
             color: #f5f0e8;
             border-bottom-color: #1a1610;
+        }
+
+        body.ljust #legende {
+            border-bottom-color: #cccccc;
         }
 
         body.ljust #meddelanden {
@@ -319,6 +333,7 @@
         <div id="sp-beskrivning"></div>
         <div id="sp-sammanfattning" style="margin-top:6px;opacity:0.7;font-style:italic;font-size:11px;"></div>
     </div>
+    <div id="legende"></div>
     <div id="meddelanden"></div>
     <div id="input-area">
         <button id="korsreferera" title="Korsreferera annan markering">↔</button>
