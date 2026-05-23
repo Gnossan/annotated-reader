@@ -205,10 +205,24 @@
             line-height: 1.5;
             border: 1px solid #333;
         `;
+        const sidSprak = document.documentElement.lang || "en";
         popup.innerHTML = `
-            <div style="font-weight:600;margin-bottom:5px;">${word}</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
+                <span style="font-weight:600;">${word}</span>
+                <button id="ar-tala-knapp" title="Listen" style="
+                    background:transparent;border:none;cursor:pointer;
+                    font-size:15px;padding:0 0 0 8px;opacity:0.7;line-height:1;
+                ">🔊</button>
+            </div>
             <div style="opacity:0.85;font-size:12px;">${definition}</div>
         `;
+        popup.querySelector("#ar-tala-knapp").addEventListener("click", (e) => {
+            e.stopPropagation();
+            window.speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(word);
+            u.lang = sidSprak;
+            window.speechSynthesis.speak(u);
+        });
         document.body.appendChild(popup);
 
         // Justera om popupen hamnar utanför skärmen
