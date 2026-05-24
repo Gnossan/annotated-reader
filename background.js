@@ -98,19 +98,26 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         chrome.storage.local.get("lang", async ({ lang = "en" }) => {
             const token = await hämtaToken();
 
+            const fleraOrd = message.word.trim().includes(" ");
             let response;
             if (token) {
                 // Inloggad — använd autentiserad chat-endpoint
                 const LANG_NAMES = { en: "English", "en-GB": "English", sv: "Swedish", da: "Danish", no: "Norwegian", de: "German", fr: "French", es: "Spanish", it: "Italian" };
                 const targetLang = LANG_NAMES[lang] || "English";
+                const prompt = fleraOrd
+                    ? `Translate or briefly explain each of these words in ${targetLang}: "${message.word}". One short line per word, format: word: explanation.`
+                    : `Define "${message.word}" in one concise dictionary-style sentence in ${targetLang}. No extra commentary, just the definition.`;
+                const system = fleraOrd
+                    ? `You translate and explain words. Respond only with one line per word in ${targetLang}.`
+                    : `You are a dictionary. Respond only with a single concise definition in ${targetLang}.`;
                 response = await fetchMedToken(
                     `${BACKEND}/api/chat`,
                     {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
-                            historik: [{ role: "user", content: `Define "${message.word}" in one concise dictionary-style sentence in ${targetLang}. No extra commentary, just the definition.` }],
-                            systemprompt: `You are a dictionary. Respond only with a single concise definition in ${targetLang}.`,
+                            historik: [{ role: "user", content: prompt }],
+                            systemprompt: system,
                             model: "claude-haiku-4-5-20251001",
                             temperature: 0.3
                         })
