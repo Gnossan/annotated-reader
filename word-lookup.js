@@ -15,6 +15,11 @@
         it:      "Hai raggiunto il limite giornaliero gratuito (20 ricerche). Accedi ad AIuda Reader per un accesso illimitato.",
     };
 
+    // Aktivera textmarkering i länktexter (t.ex. NYT-ingresser som är hela länkar)
+    const selStyle = document.createElement("style");
+    selStyle.textContent = "a { -webkit-user-select: text !important; user-select: text !important; }";
+    document.head.appendChild(selStyle);
+
     let lookupKnapp = null;
     let currentLang = "en";
     chrome.storage.local.get("lang", ({ lang = "en" }) => { currentLang = lang; });
