@@ -112,7 +112,7 @@ AIuda Reader har två huvudfunktioner som fungerar oberoende av varandra:
 
 Denna programvara får användas och distribueras fritt för privat, icke-kommersiellt bruk. Kommersiellt nyttjande är förbjudet utan upphovsmannens uttryckliga skriftliga medgivande.
 
-För licensförfrågningar: tomas@gnossa.se
+För licensförfrågningar: info@aiuda.se
 
 ---
 
