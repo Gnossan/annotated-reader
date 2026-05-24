@@ -105,10 +105,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 const LANG_NAMES = { en: "English", "en-GB": "English", sv: "Swedish", da: "Danish", no: "Norwegian", de: "German", fr: "French", es: "Spanish", it: "Italian" };
                 const targetLang = LANG_NAMES[lang] || "English";
                 const prompt = fleraOrd
-                    ? `Translate or briefly explain each of these words in ${targetLang}: "${message.word}". One short line per word, format: word: explanation.`
+                    ? `Translate "${message.word}" into ${targetLang}. Respond with only the translation, nothing else.`
                     : `Define "${message.word}" in one concise dictionary-style sentence in ${targetLang}. No extra commentary, just the definition.`;
                 const system = fleraOrd
-                    ? `You translate and explain words. Respond only with one line per word in ${targetLang}.`
+                    ? `You are a translator. Respond only with the translation in ${targetLang}.`
                     : `You are a dictionary. Respond only with a single concise definition in ${targetLang}.`;
                 response = await fetchMedToken(
                     `${BACKEND}/api/chat`,
