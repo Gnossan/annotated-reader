@@ -7,33 +7,46 @@ Tilläget fungerar både i Chrome och i Edge.
 
 ## Vad det gör
 
-AIuda Reader läser texten på en webbsida, skickar den till Claude och markerar meningsfulla fraser med färgkodade kategorier. Du kan sedan klicka på en markering för att läsa en förklaring, och öppna en sidopanel för att chatta med AI om just den frasen.
+AIuda Reader har två huvudfunktioner som fungerar oberoende av varandra:
 
-**Läs på vilket språk som helst — chatta på ditt eget.**
-Sidan kan vara på engelska, spanska, tyska eller vilket språk som helst. Du väljer själv vilket språk AI:n svarar på.
+**Orduppslagning** — alltid aktiv, kräver inget konto. Markera vilket ord som helst på vilken sida som helst, klicka på ?-knappen och få en ordboksdefinition på ditt språk. Klicka 🔊 för att höra ordet uttalas.
+
+**Annotering** — kräver inloggning. Claude analyserar hela sidan, identifierar teman och markerar meningsfulla fraser med färgkodade kategorier. Klicka på en markering för att chatta med AI om just den frasen.
 
 ---
 
 ## Funktioner
 
+### Orduppslagning (utan konto)
+- Markera valfritt ord på valfri sida → ?-knapp dyker upp
+- Klicka ? → ordboksdefinition på ditt valda UI-språk
+- Klicka 🔊 → ordet uttalas på sidans originalspråk
+- 20 gratis uppslagningar per dag utan inloggning
+- Obegränsat för inloggade användare
+
 ### Annotering
 - Claude analyserar texten och skapar 3–5 tematiska kategorier med unika färger
 - Fraser markeras direkt på sidan med rätt bakgrundsfärg
+- Realtids-progressbar under analysen via streaming
 - Klicka på en markering för att se kategori och beskrivning
-- Animerad laddningsindikator med tidräknare under analysen
 
 ### Manuell annotering
 - Markera valfri text och högerklicka för att välja kategori
 - Möjlighet att skapa en egen kategori med valfritt namn och färg
 
-### Chatta om sidan
-- "Chat about page"-knapp låter dig chatta om hela artikeln utan att markera något
-- Perfekt för en snabb sammanfattning eller djupare diskussion
-
-### AI-chatt per markering
-- "Utforska med AI" öppnar en sidopanel med en chattkonversation om den valda frasen
+### Sidopanel — chatt per markering
+- "Utforska med AI →" öppnar en sidopanel med chattkonversation om vald fras
 - AI:n börjar automatiskt med en kontextuell förklaring
 - Historiken per markering sparas under sessionen
+- Sidopanelen byter automatiskt kontext när du växlar flik
+
+### Klickbara kategorier
+- Klicka på en kategori i legendlistan → AI sammanfattar vad sidan säger om just det ämnet
+- Legenden sitter fast ovanför chatten och scrollar inte bort
+
+### Chatta om hela sidan
+- "Chat about page"-knapp öppnar en chattkonversation om hela artikeln
+- Varje sida har sin egen chatthistorik — blandas inte ihop vid flikbyte
 
 ### Korsreferens
 - Referera till en annan markerings diskussion direkt i chatten
@@ -43,9 +56,9 @@ Sidan kan vara på engelska, spanska, tyska eller vilket språk som helst. Du v�
 - Exportera all chatthistorik som en Markdown-fil
 - Tillgänglig via knapp i sidopanelen eller vid sidnavigering
 
-### Avancerade inställningar
+### Inställningar
 - Välj AI-modell: Opus 4.7, Sonnet 4.6 eller Haiku 4.5 (beroende på plan)
-- Välj svarsspråk: engelska, svenska, danska, norska, tyska, franska, spanska, italienska
+- Välj svarsspråk: engelska (US/UK), svenska, danska, norska, tyska, franska, spanska, italienska
 - Justera textstorlek i sidopanelen
 - Ljust och mörkt tema
 
@@ -58,17 +71,36 @@ Sidan kan vara på engelska, spanska, tyska eller vilket språk som helst. Du v�
 3. Öppna `chrome://extensions` i Chrome
 4. Aktivera **Utvecklarläge** (uppe till höger)
 5. Klicka **Ladda okomprimerat tillägg** och välj den uppackade mappen
-6. Klicka på AIuda Reader-ikonen och logga in med Google
+6. Orduppslagning fungerar direkt — logga in med Google för annotering
 
 ---
 
 ## Användning
 
+### Orduppslagning
+1. Gå till valfri sida
+2. Markera ett ord
+3. Klicka ? → definition visas
+4. Klicka 🔊 → ordet uttalas
+
+### Annotering
 1. Navigera till en sida med text du vill läsa
 2. Klicka på tilläggsikonen → **Annotate this page**
-3. Vänta på analysen — fraser markeras automatiskt
+3. Vänta på analysen — progressbar visas, fraser markeras automatiskt
 4. Klicka på en markering → läs beskrivningen
 5. Klicka **Utforska med AI →** för att öppna sidopanelen och börja chatta
+6. Klicka på en kategori i legenden för att få en sammanfattning per tema
+
+---
+
+## Planer
+
+| Plan | Orduppslagning | Annotering | Modell |
+|---|---|---|---|
+| Gratis (ej inloggad) | 20/dag | — | — |
+| Free (inloggad) | Obegränsat | ✓ | Sonnet |
+| Pro | Obegränsat | ✓ | Opus |
+| VIP | Obegränsat | ✓ | Opus |
 
 ---
 
@@ -92,5 +124,7 @@ För licensförfrågningar: tomas@gnossa.se
 | Auth | Google Sign-in via Firebase |
 | Backend | Vercel serverless (Node.js) |
 | AI | Anthropic Claude API |
+| Streaming | SSE via chrome.runtime.connect (service worker) |
 | Lagring | `chrome.storage.session` + `chrome.storage.local` + Firestore |
-| Prompt caching | Ephemeral på systemprompt + sista meddelandet |
+| TTS | Web Speech API (inbyggd i webbläsaren) |
+| Anonymt | Extension-ID rate limiting via Firestore |
