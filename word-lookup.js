@@ -31,8 +31,8 @@
 
         const urval = window.getSelection();
         if (!urval || urval.isCollapsed) return;
-        const text = urval.toString().trim();
-        if (!text || text.length > 80 || text.includes("\n")) return;
+        const text = urval.toString().trim().replace(/\s+/g, " ");
+        if (!text || text.length > 500) return;
 
         const range = urval.getRangeAt(0);
         const rect = range.getBoundingClientRect();
