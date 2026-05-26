@@ -27,7 +27,8 @@
     ],
     "host_permissions": [
         "https://annotated-reader-backend.vercel.app/*",
-        "https://annotated-reader-backend-dev.vercel.app/*"
+        "https://annotated-reader-backend-dev.vercel.app/*",
+        "<all_urls>"
     ],
     "externally_connectable": {
         "matches": ["https://annotated-reader-backend.vercel.app/*"]
