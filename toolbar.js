@@ -47,11 +47,5 @@
         chrome.runtime.sendMessage({ type: "TOOLBAR_ANNOTATE" });
     });
 
-    // 🔍 Öppna AIuda Mentor (om installerad)
-    const mentorBtn = lagaKnapp("🔍", "Open AIuda Mentor", () => {
-        chrome.runtime.sendMessage({ type: "TOOLBAR_SEARCH", query: "" });
-    });
-
     toolbar.appendChild(annotateBtn);
-    toolbar.appendChild(mentorBtn);
 })();
