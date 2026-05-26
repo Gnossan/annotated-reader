@@ -285,6 +285,21 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({});
         return true;
     }
+
+    if (message.type === "TOOLBAR_ANNOTATE") {
+        chrome.scripting.executeScript({
+            target: { tabId: sender.tab.id },
+            files: ["content.js"]
+        });
+        sendResponse({});
+        return true;
+    }
+
+    if (message.type === "TOOLBAR_SEARCH") {
+        chrome.search.query({ text: message.query, disposition: "NEW_TAB" });
+        sendResponse({});
+        return true;
+    }
 });
 
 // --- Automatiskt sidopanelsbyte vid flikbyte ---

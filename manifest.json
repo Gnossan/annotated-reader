@@ -22,7 +22,8 @@
         "scripting",
         "storage",
         "sidePanel",
-        "offscreen"
+        "offscreen",
+        "search"
     ],
     "host_permissions": [
         "https://annotated-reader-backend.vercel.app/*",
@@ -34,7 +35,7 @@
     "content_scripts": [
         {
             "matches": ["*://*/*"],
-            "js": ["word-lookup.js"],
+            "js": ["word-lookup.js", "toolbar.js"],
             "run_at": "document_idle",
             "all_frames": false
         }
