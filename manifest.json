@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
-    "name": "AIuda Reader (dev)",
-    "version": "0.9.9.6",
+    "name": "AIuda Reader",
+    "version": "0.9.9.7",
     "description": "Annoterar webbtext via Claude API",
     "action": {
         "default_popup": "popup.html",
@@ -22,11 +22,13 @@
         "scripting",
         "storage",
         "sidePanel",
-        "offscreen"
+        "offscreen",
+        "search"
     ],
     "host_permissions": [
         "https://annotated-reader-backend.vercel.app/*",
-        "https://annotated-reader-backend-dev.vercel.app/*"
+        "https://annotated-reader-backend-dev.vercel.app/*",
+        "<all_urls>"
     ],
     "externally_connectable": {
         "matches": ["https://annotated-reader-backend.vercel.app/*"]
@@ -34,7 +36,7 @@
     "content_scripts": [
         {
             "matches": ["*://*/*"],
-            "js": ["word-lookup.js"],
+            "js": ["word-lookup.js", "toolbar.js"],
             "run_at": "document_idle",
             "all_frames": false
         }
