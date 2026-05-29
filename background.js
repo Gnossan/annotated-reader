@@ -266,8 +266,22 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         return true;
     }
 
+    if (message.type === "SPARA_ANNOTATION") {
+        if (sender.tab?.id) {
+            chrome.storage.session.set({
+                [`ar_tab_${sender.tab.id}`]: {
+                    sammanfattning: message.sammanfattning,
+                    kategorier: message.kategorier,
+                    url: message.url,
+                    title: message.title
+                }
+            });
+        }
+        sendResponse({});
+        return true;
+    }
+
     if (message.type === "OPEN_SIDEPANEL") {
-        console.log("OPEN_SIDEPANEL mottagen, tab:", sender.tab?.id);
         const kontext = {
             fras: message.fras,
             markeringId: message.markeringId,

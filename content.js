@@ -900,6 +900,15 @@ async function startAnnotering(text) {
         });
     chrome.storage.session.set({ ar_annoteringar: alleAnnoteringar });
 
+    // Spara annotationsdata per flik så Mentor kan hämta den via 📖
+    chrome.runtime.sendMessage({
+        type: "SPARA_ANNOTATION",
+        sammanfattning,
+        kategorier,
+        url: window.location.href,
+        title: document.title
+    });
+
     overlay.textContent = t.klar;
     setTimeout(() => {
         overlay.remove();
