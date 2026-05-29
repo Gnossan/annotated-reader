@@ -307,16 +307,27 @@ chrome.runtime.onMessageExternal.addListener((message, sender, sendResponse) => 
     const MENTOR_ID = "ggldnjomionlkfeebkohdlmlncbhhmgf";
     if (sender.id !== MENTOR_ID) return;
     if (message.type === "GET_ANNOTATION") {
-        chrome.tabs.query({ active: true }, (tabs) => {
-            const tab = tabs.find(t => t.url && t.url.startsWith("http"));
-            if (!tab) { sendResponse({ error: "Ingen aktiv flik" }); return; }
-            const key = `ar_tab_${tab.id}`;
-            chrome.storage.session.get(key, (stored) => {
-                if (stored[key]) {
-                    sendResponse({ annotation: stored[key], url: tab.url, title: tab.title });
-                } else {
-                    sendResponse({ ej_annoterad: true, url: tab.url, title: tab.title });
+        // Hämta all session-data och leta efter ar_tab_*-nycklar
+        chrome.storage.session.get(null, (allData) => {
+            const annoterade = Object.entries(allData)
+                .filter(([k]) => k.startsWith("ar_tab_"));
+
+            if (!annoterade.length) {
+                sendResponse({ ej_annoterad: true });
+                return;
+            }
+
+            // Ta den senaste annotationen (sista nyckeln)
+            const [nyckeln, annotation] = annoterade[annoterade.length - 1];
+            const tabId = parseInt(nyckeln.replace("ar_tab_", ""));
+
+            chrome.tabs.get(tabId, (tab) => {
+                if (chrome.runtime.lastError || !tab) {
+                    // Fliken finns inte längre — returnera annotationen ändå
+                    sendResponse({ annotation, url: "", title: "" });
+                    return;
                 }
+                sendResponse({ annotation, url: tab.url, title: tab.title });
             });
         });
         return true;
