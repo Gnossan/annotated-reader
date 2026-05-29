@@ -2,7 +2,6 @@
     "manifest_version": 3,
     "name": "AIuda Reader",
     "version": "0.9.9.7",
-    "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwR0Ay0fBXkz20CjERma4JCy4ACvqgoT4kfYnOOLYgo97psQAKID8lkacjGhkrwbCISqnZga9J9huUZVfEbcdSA5ygm51Zn3JdU74Ny2yoGyKnzQMdORuP9XirVqdnow2jlYzy2AS5vRvTMENmgo3eso2QusWNHtBrZmkdNy+gjBZzKpkYY7gU9iQwU8g1Zf4796XZ+amiLv0MyCswo0aXzTv6gJQoVx9RTlmFHq+LAORVsIRpt5mf9W9u/4DQDbYVgllfD7kpZIiLX3DbfqDusKQjHOROrELlEhnHCIQyrh/YU4m/JvjXmrUMGbHD8PyNVAEXZ3qCAsPOQYnuTd6UwIDAQAB",
     "description": "Annoterar webbtext via Claude API",
     "action": {
         "default_popup": "popup.html",
