@@ -267,6 +267,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 
     if (message.type === "OPEN_SIDEPANEL") {
+        console.log("OPEN_SIDEPANEL mottagen, tab:", sender.tab?.id);
         const kontext = {
             fras: message.fras,
             markeringId: message.markeringId,
