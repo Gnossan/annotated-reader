@@ -32,6 +32,7 @@
         "<all_urls>"
     ],
     "externally_connectable": {
+        "ids": ["ggldnjomionlkfeebkohdlmlncbhhmgf"],
         "matches": ["https://annotated-reader-backend.vercel.app/*"]
     },
     "content_scripts": [

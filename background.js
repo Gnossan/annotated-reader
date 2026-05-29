@@ -302,6 +302,27 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 });
 
+// --- Meddelanden från Mentor (cross-extension) ---
+chrome.runtime.onMessageExternal.addListener((message, sender, sendResponse) => {
+    const MENTOR_ID = "ggldnjomionlkfeebkohdlmlncbhhmgf";
+    if (sender.id !== MENTOR_ID) return;
+    if (message.type === "GET_ANNOTATION") {
+        chrome.tabs.query({ active: true }, (tabs) => {
+            const tab = tabs.find(t => t.url && t.url.startsWith("http"));
+            if (!tab) { sendResponse({ error: "Ingen aktiv flik" }); return; }
+            const key = `ar_tab_${tab.id}`;
+            chrome.storage.session.get(key, (stored) => {
+                if (stored[key]) {
+                    sendResponse({ annotation: stored[key], url: tab.url, title: tab.title });
+                } else {
+                    sendResponse({ ej_annoterad: true, url: tab.url, title: tab.title });
+                }
+            });
+        });
+        return true;
+    }
+});
+
 // --- Automatiskt sidopanelsbyte vid flikbyte ---
 chrome.tabs.onActivated.addListener(async ({ tabId }) => {
     const key = `ar_tab_${tabId}`;
