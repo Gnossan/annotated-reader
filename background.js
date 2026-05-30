@@ -83,7 +83,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     if (message.type === "REFRESH_AND_GET_CONFIG") {
         chrome.storage.local.get(["modell", "temperature", "lang"], async (result) => {
-            const modell = result.modell || "claude-opus-4-7";
+            const modell = result.modell || "claude-opus-4-8";
             const temperature = result.temperature ?? 1.0;
             const lang = result.lang || "en";
             const t = AR_LOCALES[lang] || AR_LOCALES.en;
@@ -181,7 +181,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     if (message.type === "GET_ANNOTATE_CONFIG") {
         chrome.storage.local.get(["modell", "temperature", "lang"], async (result) => {
-            const modell = result.modell || "claude-opus-4-7";
+            const modell = result.modell || "claude-opus-4-8";
             const temperature = result.temperature ?? 1.0;
             const lang = result.lang || "en";
             const t = AR_LOCALES[lang] || AR_LOCALES.en;
@@ -193,7 +193,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     if (message.type === "ANNOTATE") {
         chrome.storage.local.get(["modell", "temperature", "lang"], async (result) => {
-            const modell = result.modell || "claude-opus-4-7";
+            const modell = result.modell || "claude-opus-4-8";
             const temperature = result.temperature ?? 1.0;
             const lang = result.lang || "en";
             const t = AR_LOCALES[lang] || AR_LOCALES.en;
@@ -231,7 +231,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     if (message.type === "CHAT") {
         chrome.storage.local.get(["modell", "temperature"], async (result) => {
-            const modell = result.modell || "claude-opus-4-7";
+            const modell = result.modell || "claude-opus-4-8";
             const temperature = result.temperature ?? 1.0;
             const token = await hämtaToken();
 
@@ -430,7 +430,7 @@ chrome.runtime.onConnect.addListener((port) => {
 
     port.onMessage.addListener(async ({ text }) => {
         const result = await chrome.storage.local.get(["modell", "temperature", "lang"]);
-        const modell = result.modell || "claude-opus-4-7";
+        const modell = result.modell || "claude-opus-4-8";
         const temperature = result.temperature ?? 1.0;
         const lang = result.lang || "en";
         const t = AR_LOCALES[lang] || AR_LOCALES.en;

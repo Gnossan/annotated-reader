@@ -55,7 +55,7 @@ kollaVersion();
 // --- Auth ---
 chrome.storage.local.get(["arUser", "arToken", "modell", "temperature", "lang"], (result) => {
     const lang  = result.lang  || "en";
-    const modell = result.modell || "claude-opus-4-7";
+    const modell = result.modell || "claude-opus-4-8";
     const temp  = result.temperature ?? 1.0;
 
     popupT = AR_LOCALES[lang] || AR_LOCALES.en;
@@ -251,7 +251,7 @@ document.getElementById("sign-out-btn").addEventListener("click", () => {
 });
 
 const MODELLER = {
-    "claude-opus-4-7":           { fixedTemp: true },
+    "claude-opus-4-8":           { fixedTemp: true },
     "claude-sonnet-4-6":         { fixedTemp: false },
     "claude-haiku-4-5-20251001": { fixedTemp: false }
 };
