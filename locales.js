@@ -308,7 +308,7 @@ ${text}`,
 
     es: {
         apiNyckel: "Clave API", apiPlaceholder: "sk-ant-...", sparaNyckel: "Guardar clave",
-        annoteraSidan: "Anotar esta página", avancerat: "Avanzado...", modellLabel: "Modelo",
+        annoteraSidan: "Analizar esta página", avancerat: "Avanzado...", modellLabel: "Modelo",
         temperatureLabel: "Temperatura", valjFarg: "Elegir color", spara: "Guardar",
         nyckelSparad: "Clave guardada", sparad: "Guardado", installningarSparade: "Ajustes guardados",
         opusTempNot: "Opus 4.7 requiere temperatura 1.0", sprakLabel: "Idioma",
@@ -338,7 +338,7 @@ ${text}`,
 
     fr: {
         apiNyckel: "Clé API", apiPlaceholder: "sk-ant-...", sparaNyckel: "Enregistrer la clé",
-        annoteraSidan: "Annoter cette page", avancerat: "Avancé...", modellLabel: "Modèle",
+        annoteraSidan: "Analyser cette page", avancerat: "Avancé...", modellLabel: "Modèle",
         temperatureLabel: "Température", valjFarg: "Choisir couleur", spara: "Enregistrer",
         nyckelSparad: "Clé enregistrée", sparad: "Enregistré", installningarSparade: "Paramètres enregistrés",
         opusTempNot: "Opus 4.7 nécessite température 1.0", sprakLabel: "Langue",
@@ -368,7 +368,7 @@ ${text}`,
 
     de: {
         apiNyckel: "API-Schlüssel", apiPlaceholder: "sk-ant-...", sparaNyckel: "Schlüssel speichern",
-        annoteraSidan: "Diese Seite annotieren", avancerat: "Erweitert...", modellLabel: "Modell",
+        annoteraSidan: "Diese Seite analysieren", avancerat: "Erweitert...", modellLabel: "Modell",
         temperatureLabel: "Temperatur", valjFarg: "Farbe wählen", spara: "Speichern",
         nyckelSparad: "Schlüssel gespeichert", sparad: "Gespeichert", installningarSparade: "Einstellungen gespeichert",
         opusTempNot: "Opus 4.7 benötigt Temperatur 1.0", sprakLabel: "Sprache",
@@ -398,7 +398,7 @@ ${text}`,
 
     it: {
         apiNyckel: "Chiave API", apiPlaceholder: "sk-ant-...", sparaNyckel: "Salva chiave",
-        annoteraSidan: "Annota questa pagina", avancerat: "Avanzato...", modellLabel: "Modello",
+        annoteraSidan: "Analizza questa pagina", avancerat: "Avanzato...", modellLabel: "Modello",
         temperatureLabel: "Temperatura", valjFarg: "Scegli colore", spara: "Salva",
         nyckelSparad: "Chiave salvata", sparad: "Salvato", installningarSparade: "Impostazioni salvate",
         opusTempNot: "Opus 4.7 richiede temperatura 1.0", sprakLabel: "Lingua",
@@ -428,7 +428,7 @@ ${text}`,
 
     no: {
         apiNyckel: "API-nøkkel", apiPlaceholder: "sk-ant-...", sparaNyckel: "Lagre nøkkel",
-        annoteraSidan: "Annotér denne siden", avancerat: "Avansert...", modellLabel: "Modell",
+        annoteraSidan: "Analyser denne siden", avancerat: "Avansert...", modellLabel: "Modell",
         temperatureLabel: "Temperatur", valjFarg: "Velg farge", spara: "Lagre",
         nyckelSparad: "Nøkkel lagret", sparad: "Lagret", installningarSparade: "Innstillinger lagret",
         opusTempNot: "Opus 4.7 krever temperatur 1.0", sprakLabel: "Språk",
@@ -458,7 +458,7 @@ ${text}`,
 
     da: {
         apiNyckel: "API-nøgle", apiPlaceholder: "sk-ant-...", sparaNyckel: "Gem nøgle",
-        annoteraSidan: "Annotér denne side", avancerat: "Avanceret...", modellLabel: "Model",
+        annoteraSidan: "Analyser denne side", avancerat: "Avanceret...", modellLabel: "Model",
         temperatureLabel: "Temperatur", valjFarg: "Vælg farve", spara: "Gem",
         nyckelSparad: "Nøgle gemt", sparad: "Gemt", installningarSparade: "Indstillinger gemt",
         opusTempNot: "Opus 4.7 kræver temperatur 1.0", sprakLabel: "Sprog",
