@@ -44,9 +44,7 @@ function justeraFontGlobal(delta) {
 document.addEventListener("wheel", (e) => {
     if (!e.shiftKey) return;
     e.preventDefault();
-    const sektionEl = FONT_SEKTIONER
-        .map(id => document.getElementById(id))
-        .find(el => el?.contains(document.elementFromPoint(e.clientX, e.clientY)));
+    const sektionEl = e.target.closest(FONT_SEKTIONER.map(id => "#" + id).join(", "));
     if (!sektionEl) return;
     const nuvarande = parseFloat(sektionEl.style.fontSize) || FONT_DEFAULT;
     const ny = e.deltaY > 0
