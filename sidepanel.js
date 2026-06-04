@@ -295,11 +295,7 @@ async function skicka() {
 function laggTillBubbla(roll, text, skrolla = true) {
     const div = document.createElement("div");
     div.className = `bubbla ${roll}`;
-    if (roll === "assistant") {
-        div.innerHTML = marked.parse(text);
-    } else {
-        div.textContent = text;
-    }
+    div.textContent = text;
     const container = document.getElementById("meddelanden");
     container.appendChild(div);
     if (skrolla) {

@@ -74,6 +74,7 @@ The text is about: ${sammanfattning}
 The user has highlighted the phrase "${fras}" in the category "${kategori}".
 Description: ${beskrivning}
 Help the user explore and understand this phrase in its context.
+Use Markdown formatting where it adds clarity (headings, bullets, bold). Keep responses concise.
 Always respond in English, regardless of the language of the text.`,
 
         helTextSystemPrompt: (text, sammanfattning) =>
@@ -84,6 +85,7 @@ Full text:
 ${text}
 
 Help the user explore and understand the text.
+Use Markdown formatting where it adds clarity (headings, bullets, bold). Keep responses concise.
 Always respond in English, regardless of the language of the text.`,
 
         annoteringsPrompt: (text) =>
@@ -165,6 +167,7 @@ The text is about: ${sammanfattning}
 The user has highlighted the phrase "${fras}" in the category "${kategori}".
 Description: ${beskrivning}
 Help the user explore and understand this phrase in its context.
+Use Markdown formatting where it adds clarity (headings, bullets, bold). Keep responses concise.
 Always respond in English, regardless of the language of the text.`,
 
         helTextSystemPrompt: (text, sammanfattning) =>
@@ -175,6 +178,7 @@ Full text:
 ${text}
 
 Help the user explore and understand the text.
+Use Markdown formatting where it adds clarity (headings, bullets, bold). Keep responses concise.
 Always respond in English, regardless of the language of the text.`,
 
         annoteringsPrompt: (text) =>
@@ -268,6 +272,7 @@ Texten handlar om: ${sammanfattning}
 Användaren har markerat frasen "${fras}" i kategorin "${kategori}".
 Beskrivning: ${beskrivning}
 Hjälp användaren utforska och förstå denna fras i sitt sammanhang.
+Använd Markdown-formatering där det tillför tydlighet (rubriker, punktlistor, fetstil). Håll svaren koncisa.
 Svara alltid på svenska, oavsett vilket språk texten är skriven på.`,
 
         helTextSystemPrompt: (text, sammanfattning) =>
@@ -278,6 +283,7 @@ Hela texten:
 ${text}
 
 Hjälp användaren utforska och förstå texten.
+Använd Markdown-formatering där det tillför tydlighet (rubriker, punktlistor, fetstil). Håll svaren koncisa.
 Svara alltid på svenska, oavsett vilket språk texten är skriven på.`,
 
         annoteringsPrompt: (text) =>
