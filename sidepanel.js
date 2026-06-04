@@ -5,40 +5,57 @@ let nuvarandeMeta = {};
 let nuvarandeErHelSida = false;
 let t = AR_LOCALES.en;
 
-chrome.storage.local.get(["lang", "tema", "fontSize"], ({ lang = "en", tema = "mörkt", fontSize = 13 }) => {
+// Sektioner som har egna teckenstorlekar
+const FONT_SEKTIONER = ["kontext", "legende", "meddelanden"];
+const FONT_MIN = 10, FONT_MAX = 22, FONT_DEFAULT = 13;
+
+chrome.storage.local.get(["lang", "tema", "fontSizes"], ({ lang = "en", tema = "mörkt", fontSizes = {} }) => {
     t = AR_LOCALES[lang] || AR_LOCALES.en;
     document.getElementById("header-text").textContent  = t.header;
     document.getElementById("exportera").textContent    = t.exportera;
     document.getElementById("input").placeholder        = t.stallEnFraga;
     tillampaTemat(tema);
-    tillampaFontSize(fontSize);
+    FONT_SEKTIONER.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.fontSize = (fontSizes[id] || FONT_DEFAULT) + "px";
+    });
 });
 
-function tillampaFontSize(size) {
-    document.documentElement.style.setProperty("--ar-font-size", size + "px");
+// A/A-knapparna justerar den sektion som är närmast synlig i mitten
+document.getElementById("font-liten").addEventListener("click", () => justeraFontGlobal(-1));
+document.getElementById("font-stor").addEventListener("click",  () => justeraFontGlobal(+1));
+
+function justeraFontGlobal(delta) {
+    const sizes = {};
+    FONT_SEKTIONER.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const nuvarande = parseFloat(el.style.fontSize) || FONT_DEFAULT;
+        const ny = Math.min(FONT_MAX, Math.max(FONT_MIN, nuvarande + delta));
+        el.style.fontSize = ny + "px";
+        sizes[id] = ny;
+    });
+    chrome.storage.local.get("fontSizes", ({ fontSizes = {} }) => {
+        chrome.storage.local.set({ fontSizes: { ...fontSizes, ...sizes } });
+    });
 }
 
-document.getElementById("font-liten").addEventListener("click", () => {
-    const nuvarande = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--ar-font-size")) || 13;
-    const ny = Math.max(10, nuvarande - 1);
-    tillampaFontSize(ny);
-    chrome.storage.local.set({ fontSize: ny });
-});
-
-document.getElementById("font-stor").addEventListener("click", () => {
-    const nuvarande = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--ar-font-size")) || 13;
-    const ny = Math.min(18, nuvarande + 1);
-    tillampaFontSize(ny);
-    chrome.storage.local.set({ fontSize: ny });
-});
-
+// Shift+scroll: justera den sektion muspekaren befinner sig i
 document.addEventListener("wheel", (e) => {
     if (!e.shiftKey) return;
     e.preventDefault();
-    const nuvarande = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--ar-font-size")) || 13;
-    const ny = e.deltaY > 0 ? Math.max(10, nuvarande - 1) : Math.min(18, nuvarande + 1);
-    tillampaFontSize(ny);
-    chrome.storage.local.set({ fontSize: ny });
+    const sektionEl = FONT_SEKTIONER
+        .map(id => document.getElementById(id))
+        .find(el => el?.contains(document.elementFromPoint(e.clientX, e.clientY)));
+    if (!sektionEl) return;
+    const nuvarande = parseFloat(sektionEl.style.fontSize) || FONT_DEFAULT;
+    const ny = e.deltaY > 0
+        ? Math.max(FONT_MIN, nuvarande - 1)
+        : Math.min(FONT_MAX, nuvarande + 1);
+    sektionEl.style.fontSize = ny + "px";
+    chrome.storage.local.get("fontSizes", ({ fontSizes = {} }) => {
+        chrome.storage.local.set({ fontSizes: { ...fontSizes, [sektionEl.id]: ny } });
+    });
 }, { passive: false });
 
 function tillampaTemat(tema) {
