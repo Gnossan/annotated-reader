@@ -342,8 +342,8 @@ function visaLegende(kategorier) {
         <div class="ar-legend-item" data-namn="${k.namn}" style="display:flex;align-items:center;gap:8px;margin-bottom:6px;cursor:pointer;padding:4px 6px;border-radius:4px;margin-left:-6px;">
             <div style="width:12px;height:12px;border-radius:3px;background:${k.farg};flex-shrink:0;"></div>
             <div>
-                <span style="font-weight:600;font-size:12px;">${k.namn}</span>
-                <span style="opacity:0.6;font-size:11px;"> — ${k.beskrivning}</span>
+                <span style="font-weight:600;font-size:1em;">${k.namn}</span>
+                <span style="opacity:0.6;font-size:0.9em;"> — ${k.beskrivning}</span>
             </div>
         </div>
     `).join("");
