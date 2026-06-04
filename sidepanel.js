@@ -32,6 +32,15 @@ document.getElementById("font-stor").addEventListener("click", () => {
     chrome.storage.local.set({ fontSize: ny });
 });
 
+document.addEventListener("wheel", (e) => {
+    if (!e.shiftKey) return;
+    e.preventDefault();
+    const nuvarande = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--ar-font-size")) || 13;
+    const ny = e.deltaY > 0 ? Math.max(10, nuvarande - 1) : Math.min(18, nuvarande + 1);
+    tillampaFontSize(ny);
+    chrome.storage.local.set({ fontSize: ny });
+}, { passive: false });
+
 function tillampaTemat(tema) {
     const ljust = tema === "ljust";
     document.body.classList.toggle("ljust", ljust);
