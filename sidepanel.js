@@ -47,7 +47,8 @@ document.addEventListener("wheel", (e) => {
     const sektionEl = e.target.closest(FONT_SEKTIONER.map(id => "#" + id).join(", "));
     if (!sektionEl) return;
     const nuvarande = parseFloat(sektionEl.style.fontSize) || FONT_DEFAULT;
-    const ny = e.deltaY > 0
+    const delta = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+    const ny = delta > 0
         ? Math.max(FONT_MIN, nuvarande - 1)
         : Math.min(FONT_MAX, nuvarande + 1);
     sektionEl.style.fontSize = ny + "px";
