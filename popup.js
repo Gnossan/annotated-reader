@@ -53,7 +53,7 @@ async function kollaVersion() {
 kollaVersion();
 
 // --- Auth ---
-chrome.storage.local.get(["arUser", "arToken", "modell", "temperature", "lang"], (result) => {
+chrome.storage.local.get(["arUser", "arToken", "modell", "temperature", "lang", "annotationHotkey"], (result) => {
     const lang  = result.lang  || "en";
     const modell = result.modell || "claude-opus-4-8";
     const temp  = result.temperature ?? 1.0;
@@ -64,6 +64,10 @@ chrome.storage.local.get(["arUser", "arToken", "modell", "temperature", "lang"],
     document.getElementById("modell-val").value = modell;
     document.getElementById("temp-slider").value = temp;
     document.getElementById("temp-värde").textContent = parseFloat(temp).toFixed(1);
+    document.getElementById("genväg-länk")?.addEventListener("click", (e) => {
+        e.preventDefault();
+        chrome.tabs.create({ url: "chrome://extensions/shortcuts" });
+    });
 
     tillampaSprak(popupT);
     visaAuthState(result.arUser || null);
@@ -279,7 +283,7 @@ document.getElementById("annotate-btn").addEventListener("click", () => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         chrome.scripting.executeScript({
             target: { tabId: tabs[0].id },
-            files: ["content.js"]
+            files: ["kryptering.js", "content.js"]
         });
         window.close();
     });
@@ -309,9 +313,9 @@ document.getElementById("temp-slider").addEventListener("input", (e) => {
 
 // --- Spara avancerat ---
 document.getElementById("spara-avancerat").addEventListener("click", () => {
-    const lang   = document.getElementById("sprak-val").value;
-    const modell = document.getElementById("modell-val").value;
-    const temp   = parseFloat(document.getElementById("temp-slider").value);
+    const lang     = document.getElementById("sprak-val").value;
+    const modell   = document.getElementById("modell-val").value;
+    const temp     = parseFloat(document.getElementById("temp-slider").value);
     const t = AR_LOCALES[lang] || AR_LOCALES.en;
 
     chrome.storage.local.set({ lang, modell, temperature: temp }, () => {
@@ -319,6 +323,104 @@ document.getElementById("spara-avancerat").addEventListener("click", () => {
         setTimeout(() => { status.textContent = ""; }, 2000);
     });
 });
+
+// ── Kryptering ─────────────────────────────────────────────────────────────
+
+async function uppdateraKrypteringsStatus() {
+    const { arKrypteringsNyckel } = await chrome.storage.session.get("arKrypteringsNyckel");
+    const statusEl = document.getElementById("kryptering-status");
+    const knappEl  = document.getElementById("kryptering-knapp");
+    if (arKrypteringsNyckel) {
+        statusEl.textContent = "🔒 Encryption active";
+        statusEl.style.color = "#2a7a2a";
+        knappEl.textContent = "🔑 Change password…";
+    } else {
+        statusEl.textContent = "🔓 Not set up";
+        statusEl.style.color = "#888";
+        knappEl.textContent = "🔑 Set up encryption…";
+    }
+}
+
+document.getElementById("kryptering-knapp").addEventListener("click", async () => {
+    const { arToken, arUser } = await new Promise(r => chrome.storage.local.get(["arToken", "arUser"], r));
+    if (!arToken) return;
+
+    const fjärr = await window.AR_KRYPTERING.hämtaKrypteringsnyckelFrånBackend(arToken);
+    const { arKrypteringsNyckel } = await chrome.storage.session.get("arKrypteringsNyckel");
+
+    if (fjärr?.wrappedKey && !arKrypteringsNyckel) {
+        // Nyckel finns i Firebase men inte upplåst — visa upplåsningsdialog
+        visaUppLåsningsDialog(fjärr, arToken);
+    } else {
+        // Skapa nytt lösenord
+        visaNyLösenordDialog(arToken);
+    }
+});
+
+function visaUppLåsningsDialog(nyckelData, token) {
+    const ov = skapaOverlay(`
+        <div style="font-weight:600;margin-bottom:10px;color:#f0c040;">🔑 Unlock encryption</div>
+        <p style="font-size:11px;opacity:0.8;margin-bottom:10px;">Enter your AIuda Suite password.</p>
+        <input id="kryp-lösenord" type="password" placeholder="Password" style="width:100%;padding:7px;background:#2a2218;border:1px solid #555;border-radius:4px;color:#f5f0e8;font-size:12px;margin-bottom:6px;box-sizing:border-box;">
+        <div id="kryp-fel" style="color:#ff6b6b;font-size:11px;margin-bottom:6px;display:none;">Wrong password</div>
+        <div style="display:flex;gap:6px;">
+            <button id="kryp-ok" style="flex:1;padding:7px;background:#f0c040;color:#1a1610;border:none;border-radius:4px;cursor:pointer;font-weight:600;">Unlock</button>
+            <button id="kryp-avbryt" style="flex:1;padding:7px;background:transparent;color:#f5f0e8;border:1px solid #555;border-radius:4px;cursor:pointer;">Cancel</button>
+        </div>
+    `);
+    ov.querySelector("#kryp-avbryt").addEventListener("click", () => ov.remove());
+    ov.querySelector("#kryp-ok").addEventListener("click", async () => {
+        const lösenord = ov.querySelector("#kryp-lösenord").value;
+        if (!lösenord) return;
+        try {
+            await window.AR_KRYPTERING.importeraNyckelMedLösenord(lösenord, nyckelData);
+            ov.remove();
+            uppdateraKrypteringsStatus();
+        } catch {
+            ov.querySelector("#kryp-fel").style.display = "block";
+        }
+    });
+    ov.querySelector("#kryp-lösenord").addEventListener("keydown", e => { if (e.key === "Enter") ov.querySelector("#kryp-ok").click(); });
+    setTimeout(() => ov.querySelector("#kryp-lösenord").focus(), 50);
+}
+
+function visaNyLösenordDialog(token) {
+    const ov = skapaOverlay(`
+        <div style="font-weight:600;margin-bottom:10px;color:#f0c040;">🔑 Set up encryption</div>
+        <p style="font-size:11px;opacity:0.8;margin-bottom:10px;">Choose a password to protect your annotations. Use the same password in all AIuda apps.</p>
+        <input id="kryp-lösenord1" type="password" placeholder="Password (min. 8 chars)" style="width:100%;padding:7px;background:#2a2218;border:1px solid #555;border-radius:4px;color:#f5f0e8;font-size:12px;margin-bottom:6px;box-sizing:border-box;">
+        <input id="kryp-lösenord2" type="password" placeholder="Confirm password" style="width:100%;padding:7px;background:#2a2218;border:1px solid #555;border-radius:4px;color:#f5f0e8;font-size:12px;margin-bottom:6px;box-sizing:border-box;">
+        <div id="kryp-fel" style="color:#ff6b6b;font-size:11px;margin-bottom:6px;display:none;"></div>
+        <div style="display:flex;gap:6px;">
+            <button id="kryp-ok" style="flex:1;padding:7px;background:#f0c040;color:#1a1610;border:none;border-radius:4px;cursor:pointer;font-weight:600;">Save</button>
+            <button id="kryp-avbryt" style="flex:1;padding:7px;background:transparent;color:#f5f0e8;border:1px solid #555;border-radius:4px;cursor:pointer;">Cancel</button>
+        </div>
+    `);
+    ov.querySelector("#kryp-avbryt").addEventListener("click", () => ov.remove());
+    ov.querySelector("#kryp-ok").addEventListener("click", async () => {
+        const l1 = ov.querySelector("#kryp-lösenord1").value;
+        const l2 = ov.querySelector("#kryp-lösenord2").value;
+        const felEl = ov.querySelector("#kryp-fel");
+        if (l1.length < 8) { felEl.textContent = "Min. 8 characters"; felEl.style.display = "block"; return; }
+        if (l1 !== l2)     { felEl.textContent = "Passwords don't match"; felEl.style.display = "block"; return; }
+        await window.AR_KRYPTERING.genereraNyNyckel();
+        const nyckelData = await window.AR_KRYPTERING.exporteraNyckelMedLösenord(l1);
+        await window.AR_KRYPTERING.sparaKrypteringsnyckelTillBackend(token, nyckelData);
+        ov.remove();
+        uppdateraKrypteringsStatus();
+    });
+    setTimeout(() => ov.querySelector("#kryp-lösenord1").focus(), 50);
+}
+
+function skapaOverlay(innerHtml) {
+    const ov = document.createElement("div");
+    ov.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;display:flex;align-items:center;justify-content:center;";
+    ov.innerHTML = `<div style="background:#1a1610;border:1px solid #555;border-radius:8px;padding:18px;width:230px;font-family:'DM Mono',monospace;font-size:12px;color:#f5f0e8;line-height:1.5;">${innerHtml}</div>`;
+    document.body.appendChild(ov);
+    return ov;
+}
+
+uppdateraKrypteringsStatus();
 
 function uppdateraTempUI(modell, t) {
     const slider = document.getElementById("temp-slider");

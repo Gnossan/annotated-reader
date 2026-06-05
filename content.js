@@ -46,6 +46,9 @@ const AR_CONTENT = {
         exportBeskrivning: "Description",
         exportDu:          "You",
         exportIngenChatt:  "*No chat*",
+        sparadAnalys:      (datum) => `You annotated this page on ${datum}. Reuse the analysis?`,
+        återanvänd:        "Reuse",
+        annoteraOmFrisk:   "Annotate fresh",
     },
     "en-GB": {
         chatOmSidan:           "Chat about page",
@@ -83,6 +86,9 @@ const AR_CONTENT = {
         exportBeskrivning: "Description",
         exportDu:          "You",
         exportIngenChatt:  "*No chat*",
+        sparadAnalys:      (datum) => `You annotated this page on ${datum}. Reuse the analysis?`,
+        återanvänd:        "Reuse",
+        annoteraOmFrisk:   "Annotate fresh",
     },
     es: {
         chatOmSidan: "Chat sobre la página", redanAnnoterad: "Página ya anotada",
@@ -98,6 +104,8 @@ const AR_CONTENT = {
         fortsattVanta: "Seguir esperando", trunkeraForsok: (k) => `Truncar (~${k}k caracteres) y reintentar`,
         exportRubrik: "AIuda Reader — Historial exportado", exportDatum: "Exportado", datumLocale: "es-ES",
         exportKategori: "Categoría", exportBeskrivning: "Descripción", exportDu: "Tú", exportIngenChatt: "*Sin chat*",
+        sparadAnalys: (datum) => `Anotaste esta página el ${datum}. ¿Reutilizar el análisis?`,
+        återanvänd: "Reutilizar", annoteraOmFrisk: "Anotar de nuevo",
     },
     fr: {
         chatOmSidan: "Chat sur la page", redanAnnoterad: "Page déjà annotée",
@@ -113,6 +121,8 @@ const AR_CONTENT = {
         fortsattVanta: "Continuer à attendre", trunkeraForsok: (k) => `Tronquer (~${k}k caractères) et réessayer`,
         exportRubrik: "AIuda Reader — Historique exporté", exportDatum: "Exporté", datumLocale: "fr-FR",
         exportKategori: "Catégorie", exportBeskrivning: "Description", exportDu: "Vous", exportIngenChatt: "*Pas de chat*",
+        sparadAnalys: (datum) => `Vous avez annoté cette page le ${datum}. Réutiliser l'analyse ?`,
+        återanvänd: "Réutiliser", annoteraOmFrisk: "Annoter à nouveau",
     },
     de: {
         chatOmSidan: "Chat über die Seite", redanAnnoterad: "Seite bereits annotiert",
@@ -128,6 +138,8 @@ const AR_CONTENT = {
         fortsattVanta: "Weiter warten", trunkeraForsok: (k) => `Kürzen (~${k}k Zeichen) und erneut versuchen`,
         exportRubrik: "AIuda Reader — Exportierter Verlauf", exportDatum: "Exportiert", datumLocale: "de-DE",
         exportKategori: "Kategorie", exportBeskrivning: "Beschreibung", exportDu: "Sie", exportIngenChatt: "*Kein Chat*",
+        sparadAnalys: (datum) => `Sie haben diese Seite am ${datum} annotiert. Analyse wiederverwenden?`,
+        återanvänd: "Wiederverwenden", annoteraOmFrisk: "Neu annotieren",
     },
     it: {
         chatOmSidan: "Chat sulla pagina", redanAnnoterad: "Pagina già annotata",
@@ -143,6 +155,8 @@ const AR_CONTENT = {
         fortsattVanta: "Continua ad aspettare", trunkeraForsok: (k) => `Tronca (~${k}k caratteri) e riprova`,
         exportRubrik: "AIuda Reader — Cronologia esportata", exportDatum: "Esportato", datumLocale: "it-IT",
         exportKategori: "Categoria", exportBeskrivning: "Descrizione", exportDu: "Tu", exportIngenChatt: "*Nessuna chat*",
+        sparadAnalys: (datum) => `Hai annotato questa pagina il ${datum}. Riutilizzare l'analisi?`,
+        återanvänd: "Riutilizza", annoteraOmFrisk: "Annota di nuovo",
     },
     no: {
         chatOmSidan: "Chat om siden", redanAnnoterad: "Siden er allerede annotert",
@@ -158,6 +172,8 @@ const AR_CONTENT = {
         fortsattVanta: "Fortsett å vente", trunkeraForsok: (k) => `Forkort (~${k}k tegn) og prøv igjen`,
         exportRubrik: "AIuda Reader — Eksportert historikk", exportDatum: "Eksportert", datumLocale: "nb-NO",
         exportKategori: "Kategori", exportBeskrivning: "Beskrivelse", exportDu: "Du", exportIngenChatt: "*Ingen chat*",
+        sparadAnalys: (datum) => `Du annoterte denne siden ${datum}. Gjenbruke analysen?`,
+        återanvänd: "Gjenbruk", annoteraOmFrisk: "Annotér på nytt",
     },
     da: {
         chatOmSidan: "Chat om siden", redanAnnoterad: "Siden er allerede annoteret",
@@ -173,6 +189,8 @@ const AR_CONTENT = {
         fortsattVanta: "Fortsæt med at vente", trunkeraForsok: (k) => `Afkort (~${k}k tegn) og prøv igen`,
         exportRubrik: "AIuda Reader — Eksporteret historik", exportDatum: "Eksporteret", datumLocale: "da-DK",
         exportKategori: "Kategori", exportBeskrivning: "Beskrivelse", exportDu: "Du", exportIngenChatt: "*Ingen chat*",
+        sparadAnalys: (datum) => `Du annoterede denne side den ${datum}. Genbruge analysen?`,
+        återanvänd: "Genbrug", annoteraOmFrisk: "Annotér forfra",
     },
     sv: {
         chatOmSidan:           "Chatta om sidan",
@@ -211,12 +229,139 @@ const AR_CONTENT = {
         exportBeskrivning: "Beskrivning",
         exportDu:          "Du",
         exportIngenChatt:  "*Ingen chatt*",
+        sparadAnalys:      (datum) => `Du annoterade den här sidan ${datum}. Återanvänd analysen?`,
+        återanvänd:        "Återanvänd",
+        annoteraOmFrisk:   "Annotera på nytt",
     }
 };
 
 let t = AR_CONTENT.en;
 
-// Dessa hanteras av locales.js i HTML-sidor men behövs inline i content.js
+// ============================================================
+// SPARADE ANNOTERINGAR — återanvänd analys för samma sida
+// ============================================================
+
+const AR_BACKEND = "https://annotated-reader-backend.vercel.app";
+
+function normaliseraUrl(url) {
+    try {
+        const u = new URL(url);
+        const path = u.pathname.replace(/\/+$/, "") || "/";
+        return (u.hostname + path).toLowerCase();
+    } catch { return url.toLowerCase().slice(0, 500); }
+}
+
+async function hämtaSparadAnnotation(token) {
+    try {
+        const resp = await fetch(
+            `${AR_BACKEND}/api/page-annotation?url=${encodeURIComponent(window.location.href)}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+        );
+        if (!resp.ok) return null;
+        const data = await resp.json();
+        return data.found ? data : null;
+    } catch { return null; }
+}
+
+async function sparaAnnotationTillBackend(token) {
+    if (!token || !sammanfattning || !kategorier.length) return;
+    try {
+        const nyckel = await window.AR_KRYPTERING?.hämtaNyckel();
+        if (!nyckel) {
+            console.warn("[AIuda] Ingen krypteringsnyckel — annotation sparas ej.");
+            return;
+        }
+        const krypteratInnehåll = await window.AR_KRYPTERING.kryptera({
+            sammanfattning,
+            kategorier,
+            annoteringar: alleAnnoteringar
+        });
+        await fetch(`${AR_BACKEND}/api/page-annotation`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+            body: JSON.stringify({
+                url: window.location.href,
+                title: document.title,
+                krypteratInnehåll
+            })
+        });
+    } catch (e) { console.warn("[AIuda] Kunde inte spara annotation:", e.message); }
+}
+
+function visaÅteranvändPrompt(sparad, onÅteranvänd, onFrisk) {
+    const datum = sparad.sparadDatum
+        ? new Date(sparad.sparadDatum).toLocaleDateString(t.datumLocale || "sv-SE")
+        : "?";
+
+    const dialog = document.createElement("div");
+    dialog.style.cssText = `
+        position:fixed;top:20px;left:50%;transform:translateX(-50%);
+        background:#211c14;border:1px solid #f0c040;border-radius:8px;
+        color:#f5f0e8;font-family:'DM Mono',monospace;font-size:13px;
+        padding:16px 20px;z-index:2147483647;box-shadow:0 4px 24px rgba(0,0,0,0.6);
+        display:flex;flex-direction:column;gap:12px;max-width:380px;
+    `;
+    dialog.innerHTML = `
+        <div style="line-height:1.5">${t.sparadAnalys(datum)}</div>
+        <div style="display:flex;gap:8px;">
+            <button id="ar-återanvänd" style="background:#f0c040;color:#1a1610;border:none;border-radius:5px;padding:7px 14px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;">${t.återanvänd}</button>
+            <button id="ar-frisk" style="background:transparent;color:#f5f0e8;border:1px solid #33302a;border-radius:5px;padding:7px 14px;cursor:pointer;font-family:inherit;font-size:12px;">${t.annoteraOmFrisk}</button>
+        </div>
+    `;
+    document.body.appendChild(dialog);
+
+    dialog.querySelector("#ar-återanvänd").addEventListener("click", () => {
+        dialog.remove();
+        onÅteranvänd();
+    });
+    dialog.querySelector("#ar-frisk").addEventListener("click", () => {
+        dialog.remove();
+        onFrisk();
+    });
+
+    // Stäng automatiskt efter 15 sekunder → kör frisk annotering
+    setTimeout(() => { if (dialog.isConnected) { dialog.remove(); onFrisk(); } }, 15000);
+}
+
+async function tillämpSparadAnnotation(sparad) {
+    let innehåll = sparad;
+    if (sparad.krypteratInnehåll) {
+        const dekrypterat = await window.AR_KRYPTERING?.dekryptera(sparad.krypteratInnehåll);
+        if (!dekrypterat) {
+            console.warn("[AIuda] Kunde inte dekryptera sparad annotation.");
+            return;
+        }
+        innehåll = dekrypterat;
+    }
+    sammanfattning  = innehåll.sammanfattning || "";
+    kategorier      = innehåll.kategorier    || [];
+    alleAnnoteringar = innehåll.annoteringar  || [];
+
+    const kategorifarger = {};
+    kategorier.forEach(k => { kategorifarger[k.namn] = k.farg; });
+
+    // Återrita alla färgmarkeringar på sidan
+    alleAnnoteringar.forEach(a => markeraFras(a.text, a.kategori, a.beskrivning, kategorifarger));
+
+    // Synka till session så sidopanelen kan hämta dem
+    chrome.storage.session.set({ ar_annoteringar: alleAnnoteringar });
+
+    // Spara per flik så Mentor m.fl. kan hämta
+    chrome.runtime.sendMessage({
+        type: "SPARA_ANNOTATION",
+        sammanfattning,
+        kategorier,
+        url: window.location.href,
+        title: document.title
+    });
+
+    visaHelTextKnapp();
+}
+
+// ============================================================
+// Markera att Reader är aktiv — Dictionary hoppar av om den ser detta
+window.__aiudaReaderActive = true;
+
 
 if (document.getElementById("ar-overlay")) {
     console.log("Redan igång");
@@ -909,6 +1054,11 @@ async function startAnnotering(text) {
         title: document.title
     });
 
+    // Spara analysen persistent till backend (för återanvändning vid nästa besök)
+    chrome.storage.local.get("arToken", ({ arToken }) => {
+        if (arToken) sparaAnnotationTillBackend(arToken);
+    });
+
     overlay.textContent = t.klar;
     setTimeout(() => {
         overlay.remove();
@@ -1005,16 +1155,34 @@ function visaOmAnnoteraDialog(bekräfta) {
 }
 
 const källelement = document.getElementById("main-text") || document.body;
-chrome.storage.local.get("lang", ({ lang = "en" }) => {
+chrome.storage.local.get(["lang", "arToken"], async ({ lang = "en", arToken }) => {
     t = AR_CONTENT[lang] || AR_CONTENT.en;
+
+    const körAnnotering = () => startAnnotering(källelement.innerText);
+
     if (document.querySelector(".ar-markering")) {
+        // Sidan är redan annoterad — fråga om omStart
         visaOmAnnoteraDialog(() => {
             rensaAnnoteringar();
-            startAnnotering(källelement.innerText);
+            körAnnotering();
         });
-    } else {
-        startAnnotering(källelement.innerText);
+        return;
     }
+
+    // Inloggad? Kolla om sidan analyserats tidigare
+    if (arToken) {
+        const sparad = await hämtaSparadAnnotation(arToken);
+        if (sparad) {
+            visaÅteranvändPrompt(
+                sparad,
+                () => tillämpSparadAnnotation(sparad),  // Återanvänd
+                körAnnotering                            // Annotera på nytt
+            );
+            return;
+        }
+    }
+
+    körAnnotering();
 });
 
 })(); // IIFE slut

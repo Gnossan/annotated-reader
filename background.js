@@ -304,7 +304,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === "TOOLBAR_ANNOTATE") {
         chrome.scripting.executeScript({
             target: { tabId: sender.tab.id },
-            files: ["content.js"]
+            files: ["kryptering.js", "content.js"]
         });
         sendResponse({});
         return true;
@@ -491,4 +491,22 @@ chrome.runtime.onConnect.addListener((port) => {
             clearInterval(keepAlive);
         }
     });
+});
+
+// ── Tangentbordsgenväg via Chrome Commands API ───────────────
+chrome.commands.onCommand.addListener(async (command) => {
+    if (command !== "trigger-annotate") return;
+
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (!tab?.id) return;
+
+    // Injicera content.js om det inte redan är aktivt
+    try {
+        await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            files: ["kryptering.js", "content.js"]
+        });
+    } catch {
+        // content.js är redan injicerat — det är ok
+    }
 });
