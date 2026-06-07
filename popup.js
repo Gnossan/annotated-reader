@@ -105,73 +105,26 @@ async function hämtaKvot(token) {
 
 function visaKvot(data) {
     const kvotInfo = document.getElementById("kvot-info");
+    const saldo = data.tokenSaldo ?? 0;
+    const tomt = saldo <= 0;
 
-    // Dölj modellväljaren för free och beta — backenden bestämmer
-    const modellRad = document.getElementById("modell-label")?.parentElement;
-    if (data.plan === "free" || data.plan === "beta") {
-        document.getElementById("modell-label").style.display = "none";
-        document.getElementById("modell-val").style.display = "none";
-        const info = document.createElement("div");
-        info.style.cssText = "font-size:11px;opacity:0.6;margin-bottom:12px;";
-        info.innerHTML = `${popupT.modellInfoFree}
-            <span id="modell-info-knapp" style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;border:1px solid #999;font-size:9px;cursor:pointer;margin-left:4px;vertical-align:middle;">i</span>`;
-        const uppgraderaText = document.createElement("div");
-        uppgraderaText.id = "modell-uppgradera";
-        uppgraderaText.style.cssText = "display:none;margin-top:6px;padding:6px;background:#fff;border:1px solid #ddd;border-radius:4px;font-size:11px;line-height:1.4;color:#444;";
-        uppgraderaText.textContent = popupT.modellUppgradera;
-        info.appendChild(uppgraderaText);
-        setTimeout(() => {
-            document.getElementById("modell-info-knapp")?.addEventListener("click", () => {
-                const el = document.getElementById("modell-uppgradera");
-                el.style.display = el.style.display === "none" ? "block" : "none";
-            });
-        }, 0);
-        document.getElementById("modell-val").insertAdjacentElement("afterend", info);
-    }
-
-    if (data.vip) {
-        kvotInfo.style.display = "block";
-        document.getElementById("kvot-text").textContent = popupT.vipPlan || "VIP — unlimited";
-        document.getElementById("kvot-bar").style.width = "100%";
-        document.getElementById("kvot-bar").style.background = "#f0c040";
-        const panel = document.getElementById("uppgradera-plan");
-        panel.style.display = "block";
-        const manageBtn = document.createElement("button");
-        manageBtn.textContent = popupT.hanteraPrenumeration || "Manage subscription →";
-        manageBtn.style.cssText = "width:100%;padding:7px;background:#eee;border:1px solid #ccc;border-radius:4px;cursor:pointer;font-size:11px;margin-top:8px;";
-        manageBtn.onclick = async () => {
-            const { arToken } = await new Promise(r => chrome.storage.local.get("arToken", r));
-            const resp = await fetch("https://annotated-reader-backend.vercel.app/api/portal", {
-                method: "POST",
-                headers: { "Authorization": `Bearer ${arToken}` }
-            });
-            const data = await resp.json();
-            if (data.url) chrome.tabs.create({ url: data.url });
-        };
-        panel.appendChild(manageBtn);
-        return;
-    }
-
-    const procent = Math.min(100, Math.round((data.kreditAnvänd / data.kreditGräns) * 100));
-    const kvarK = Math.round(data.kreditKvar / 1000);
     document.getElementById("kvot-text").textContent =
-        `${kvarK}k krediter kvar denna månad (${data.plan})`;
-    document.getElementById("kvot-bar").style.width = `${procent}%`;
-    document.getElementById("kvot-bar").style.background = procent > 80 ? "#e55" : "#f0c040";
+        (popupT.tokenSaldo || "{n} tokens left").replace("{n}", saldo.toLocaleString());
+    document.getElementById("kvot-bar").style.width = tomt ? "0%" : "100%";
+    document.getElementById("kvot-bar").style.background = tomt ? "#e55" : "#f0c040";
 
     const gammalVarning = document.getElementById("kvot-varning");
     if (gammalVarning) gammalVarning.remove();
-    if (procent > 80) {
+    if (tomt) {
         const varning = document.createElement("div");
         varning.id = "kvot-varning";
         varning.style.cssText = "margin-top:6px;font-size:11px;color:#c00;font-weight:600;";
-        varning.textContent = popupT.kvotVarning || "⚠ You are approaching your monthly limit.";
+        varning.textContent = popupT.saldoSlut || "⚠ Your token balance is empty — buy more to continue.";
         document.getElementById("kvot-info").appendChild(varning);
     }
     kvotInfo.style.display = "block";
 
-    // Uppgraderingsknappar
-    visaUppgradera(data.plan);
+    visaKöpTokens();
 }
 
 async function köpProdukt(produkt) {
@@ -188,35 +141,12 @@ async function köpProdukt(produkt) {
     } catch (e) {}
 }
 
-function visaUppgradera(plan) {
-    const panel = document.getElementById("uppgradera-plan");
-    const proBtn = document.getElementById("uppgradera-pro-btn");
-    const vipBtn = document.getElementById("uppgradera-vip-btn");
-    const kreditBtns = document.querySelectorAll(".kredit-btn");
-    const isFree = plan === "free" || plan === "beta";
-    const isPro = plan === "pro";
-
+function visaKöpTokens() {
+    const panel = document.getElementById("köp-tokens");
+    const btn = document.getElementById("köp-tokens-btn");
     panel.style.display = "block";
-    document.getElementById("krediter-rubrik").textContent = popupT.köpKrediter || "Buy credits";
-
-    if (isFree) {
-        proBtn.style.display = "block";
-        proBtn.textContent = popupT.uppgraderaPro || "Upgrade to Pro — €9.99/month";
-        proBtn.onclick = () => köpProdukt("pro");
-        vipBtn.style.display = "block";
-        vipBtn.textContent = popupT.uppgraderaVip || "Upgrade to VIP — €19.99/month";
-        vipBtn.onclick = () => köpProdukt("vip");
-        const freeProds = ["credits_500k_free", "credits_2m_free", "credits_10m_free"];
-        const freeLabels = ["500k €1.99", "2M €11.99", "10M €21.99"];
-        kreditBtns.forEach((btn, i) => { btn.textContent = freeLabels[i]; btn.onclick = () => köpProdukt(freeProds[i]); });
-    } else if (isPro) {
-        vipBtn.style.display = "block";
-        vipBtn.textContent = popupT.uppgraderaVip || "Upgrade to VIP — €19.99/month";
-        vipBtn.onclick = () => köpProdukt("vip");
-        const proProds = ["credits_500k_pro", "credits_2m_pro", "credits_10m_pro"];
-        const proLabels = ["500k €0.99", "2M €2.99", "10M €9.99"];
-        kreditBtns.forEach((btn, i) => { btn.textContent = proLabels[i]; btn.onclick = () => köpProdukt(proProds[i]); });
-    }
+    btn.textContent = popupT.köpTokens || "Buy 1M tokens — 99 kr";
+    btn.onclick = () => köpProdukt("reader_tokens_1m");
 }
 
 function visaAuthState(user) {
