@@ -23,7 +23,7 @@ document.getElementById("consent-knapp").addEventListener("click", () => {
             await fetch("https://annotated-reader-backend.vercel.app/api/consent", {
                 method: "POST",
                 headers: { "Authorization": `Bearer ${arToken}` }
-            }).catch(() => {});
+            }).catch(() => { });
         }
         // Spara lokalt
         chrome.storage.local.set({ consent: true }, () => {
@@ -48,19 +48,19 @@ async function kollaVersion() {
             document.getElementById("ny-version-lank").href = data.html_url;
             document.getElementById("ny-version").style.display = "block";
         }
-    } catch (e) {}
+    } catch (e) { }
 }
 kollaVersion();
 
 // --- Auth ---
 chrome.storage.local.get(["arUser", "arToken", "modell", "temperature", "lang", "annotationHotkey"], (result) => {
-    const lang  = result.lang  || "en";
+    const lang = result.lang || "en";
     const modell = result.modell || "claude-opus-4-8";
-    const temp  = result.temperature ?? 1.0;
+    const temp = result.temperature ?? 1.0;
 
     popupT = AR_LOCALES[lang] || AR_LOCALES.en;
 
-    document.getElementById("sprak-val").value  = lang;
+    document.getElementById("sprak-val").value = lang;
     document.getElementById("modell-val").value = modell;
     document.getElementById("temp-slider").value = temp;
     document.getElementById("temp-värde").textContent = parseFloat(temp).toFixed(1);
@@ -100,7 +100,7 @@ async function hämtaKvot(token) {
         if (!resp.ok) return;
         const data = await resp.json();
         visaKvot(data);
-    } catch (e) {}
+    } catch (e) { }
 }
 
 function visaKvot(data) {
@@ -138,7 +138,7 @@ async function köpProdukt(produkt) {
         });
         const data = await resp.json();
         if (data.url) chrome.tabs.create({ url: data.url });
-    } catch (e) {}
+    } catch (e) { }
 }
 
 function visaKöpTokens() {
@@ -150,19 +150,19 @@ function visaKöpTokens() {
 }
 
 function visaAuthState(user) {
-    const signInBtn   = document.getElementById("sign-in-btn");
-    const inloggad    = document.getElementById("inloggad-info");
+    const signInBtn = document.getElementById("sign-in-btn");
+    const inloggad = document.getElementById("inloggad-info");
     const annotateBtn = document.getElementById("annotate-btn");
 
     if (user) {
-        signInBtn.style.display   = "none";
-        inloggad.style.display    = "block";
+        signInBtn.style.display = "none";
+        inloggad.style.display = "block";
         annotateBtn.style.display = "block";
         document.getElementById("user-name").textContent = user.name || user.email;
         if (user.photo) document.getElementById("user-photo").src = user.photo;
     } else {
-        signInBtn.style.display   = "flex";
-        inloggad.style.display    = "none";
+        signInBtn.style.display = "flex";
+        inloggad.style.display = "none";
         annotateBtn.style.display = "none";
     }
 }
@@ -185,18 +185,18 @@ document.getElementById("sign-out-btn").addEventListener("click", () => {
 });
 
 const MODELLER = {
-    "claude-opus-4-8":           { fixedTemp: true },
-    "claude-sonnet-4-6":         { fixedTemp: false },
+    "claude-opus-5": { fixedTemp: true },
+    "claude-sonnet-5": { fixedTemp: false },
     "claude-haiku-4-5-20251001": { fixedTemp: false }
 };
 
 function tillampaSprak(t) {
     popupT = t;
-    document.getElementById("annotate-btn").textContent   = t.annoteraSidan;
-    document.getElementById("avancerat-btn").textContent  = t.avancerat;
-    document.getElementById("sprak-label").textContent    = t.sprakLabel;
-    document.getElementById("modell-label").textContent   = t.modellLabel;
-    document.getElementById("temp-label").textContent     = t.temperatureLabel;
+    document.getElementById("annotate-btn").textContent = t.annoteraSidan;
+    document.getElementById("avancerat-btn").textContent = t.avancerat;
+    document.getElementById("sprak-label").textContent = t.sprakLabel;
+    document.getElementById("modell-label").textContent = t.modellLabel;
+    document.getElementById("temp-label").textContent = t.temperatureLabel;
     document.getElementById("spara-avancerat").textContent = t.spara;
 
     const modellVal = document.getElementById("modell-val");
@@ -243,9 +243,9 @@ document.getElementById("temp-slider").addEventListener("input", (e) => {
 
 // --- Spara avancerat ---
 document.getElementById("spara-avancerat").addEventListener("click", () => {
-    const lang     = document.getElementById("sprak-val").value;
-    const modell   = document.getElementById("modell-val").value;
-    const temp     = parseFloat(document.getElementById("temp-slider").value);
+    const lang = document.getElementById("sprak-val").value;
+    const modell = document.getElementById("modell-val").value;
+    const temp = parseFloat(document.getElementById("temp-slider").value);
     const t = AR_LOCALES[lang] || AR_LOCALES.en;
 
     chrome.storage.local.set({ lang, modell, temperature: temp }, () => {
@@ -259,7 +259,7 @@ document.getElementById("spara-avancerat").addEventListener("click", () => {
 async function uppdateraKrypteringsStatus() {
     const { arKrypteringsNyckel } = await chrome.storage.session.get("arKrypteringsNyckel");
     const statusEl = document.getElementById("kryptering-status");
-    const knappEl  = document.getElementById("kryptering-knapp");
+    const knappEl = document.getElementById("kryptering-knapp");
     if (arKrypteringsNyckel) {
         statusEl.textContent = "🔒 Encryption active";
         statusEl.style.color = "#2a7a2a";
@@ -332,7 +332,7 @@ function visaNyLösenordDialog(token) {
         const l2 = ov.querySelector("#kryp-lösenord2").value;
         const felEl = ov.querySelector("#kryp-fel");
         if (l1.length < 8) { felEl.textContent = "Min. 8 characters"; felEl.style.display = "block"; return; }
-        if (l1 !== l2)     { felEl.textContent = "Passwords don't match"; felEl.style.display = "block"; return; }
+        if (l1 !== l2) { felEl.textContent = "Passwords don't match"; felEl.style.display = "block"; return; }
         await window.AR_KRYPTERING.genereraNyNyckel();
         const nyckelData = await window.AR_KRYPTERING.exporteraNyckelMedLösenord(l1);
         await window.AR_KRYPTERING.sparaKrypteringsnyckelTillBackend(token, nyckelData);
@@ -354,8 +354,8 @@ uppdateraKrypteringsStatus();
 
 function uppdateraTempUI(modell, t) {
     const slider = document.getElementById("temp-slider");
-    const not    = document.getElementById("temp-not");
-    const fixad  = MODELLER[modell]?.fixedTemp ?? false;
+    const not = document.getElementById("temp-not");
+    const fixad = MODELLER[modell]?.fixedTemp ?? false;
 
     if (fixad) {
         slider.value = 1.0;

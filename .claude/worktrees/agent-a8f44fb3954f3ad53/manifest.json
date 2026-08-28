@@ -35,15 +35,6 @@
         "ids": ["ggldnjomionlkfeebkohdlmlncbhhmgf"],
         "matches": ["https://annotated-reader-backend.vercel.app/*"]
     },
-    "commands": {
-        "trigger-annotate": {
-            "suggested_key": {
-                "default": "Alt+Shift+A",
-                "mac": "Alt+Shift+A"
-            },
-            "description": "Start AIuda Reader annotation"
-        }
-    },
     "content_scripts": [
         {
             "matches": ["*://*/*"],

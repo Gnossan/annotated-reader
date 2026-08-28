@@ -5,68 +5,68 @@ const AR_LOCALES = {
 
     en: {
         // --- Popup ---
-        apiNyckel: "API Key",
-        apiPlaceholder: "sk-ant-...",
-        sparaNyckel: "Save key",
-        annoteraSidan: "Analyze this page",
-        avancerat: "Advanced...",
-        modellLabel: "Model",
-        temperatureLabel: "Temperature",
-        valjFarg: "Choose color",
-        spara: "Save",
-        nyckelSparad: "Key saved",
-        sparad: "Saved",
+        apiNyckel:            "API Key",
+        apiPlaceholder:       "sk-ant-...",
+        sparaNyckel:          "Save key",
+        annoteraSidan:        "Analyze this page",
+        avancerat:            "Advanced...",
+        modellLabel:          "Model",
+        temperatureLabel:     "Temperature",
+        valjFarg:             "Choose color",
+        spara:                "Save",
+        nyckelSparad:         "Key saved",
+        sparad:               "Saved",
         installningarSparade: "Settings saved",
-        opusTempNot: "Opus 5 requires temperature 1.0",
-        sprakLabel: "Language",
-        opus: "Opus 5 (most powerful)",
-        sonnet: "Sonnet 5 (balanced)",
-        haiku: "Haiku 4.5 (fastest)",
-        modellInfoFree: "Annotation: Sonnet · Chat: Haiku",
-        modellUppgradera: "Upgrade to Pro or VIP to use more powerful models like Opus for both annotation and chat.",
+        opusTempNot:          "Opus 4.7 requires temperature 1.0",
+        sprakLabel:           "Language",
+        opus:                 "Opus 4.7 (most powerful)",
+        sonnet:               "Sonnet 4.6 (balanced)",
+        haiku:                "Haiku 4.5 (fastest)",
+        modellInfoFree:       "Annotation: Sonnet · Chat: Haiku",
+        modellUppgradera:     "Upgrade to Pro or VIP to use more powerful models like Opus for both annotation and chat.",
 
-        modellInfoFree: "Annotation: Sonnet · Chat: Haiku",
-        modellUppgradera: "Upgrade to Pro or VIP to use more powerful models like Opus for both annotation and chat.",
+        modellInfoFree:       "Annotation: Sonnet · Chat: Haiku",
+        modellUppgradera:     "Upgrade to Pro or VIP to use more powerful models like Opus for both annotation and chat.",
 
 
         // --- Sidopanel ---
-        header: "AIuda Reader",
-        exportera: "↓ Export",
-        stallEnFraga: "Ask a question...",
-        ingaAndra: "No other annotations with history.",
-        valjMarkering: "Select annotation to cross-reference",
-        meddelandenSuffix: "messages",
-        nagorGickFel: "Something went wrong.",
-        kvotSlut: "Your token balance is empty. Buy more tokens to continue.",
-        kvotVarning: "⚠ You are approaching your monthly limit.",
-        vipPlan: "VIP — unlimited",
+        header:               "AIuda Reader",
+        exportera:            "↓ Export",
+        stallEnFraga:         "Ask a question...",
+        ingaAndra:            "No other annotations with history.",
+        valjMarkering:        "Select annotation to cross-reference",
+        meddelandenSuffix:    "messages",
+        nagorGickFel:         "Something went wrong.",
+        kvotSlut:             "You have used all your credits for this month. Upgrade your plan or purchase additional credits.",
+        kvotVarning:          "⚠ You are approaching your monthly limit.",
+        vipPlan:              "VIP — unlimited",
         hanteraPrenumeration: "Manage subscription →",
-        tokenSaldo: "{n} tokens left",
-        saldoSlut: "⚠ Your token balance is empty — buy more to continue.",
-        köpTokens: "Buy 1M tokens — 99 kr",
-        consentText: "AIuda Reader stores your login info and preferences locally, and your email and usage data on our servers. Text you annotate is sent to Anthropic's Claude API. The extension enables text selection within links to allow word lookup on all page types.",
-        consentLank: "Privacy Policy",
-        consentKnapp: "I agree",
-        consentText: "AIuda Reader stores your login info and preferences locally, and your email and usage data on our servers. Text you annotate is sent to Anthropic's Claude API. The extension enables text selection within links to allow word lookup on all page types.",
-        consentLank: "Privacy Policy",
-        consentKnapp: "I agree",
+        köpKrediter:          "Buy credits",
+        uppgraderaPro:        "Upgrade to Pro — €9.99/month",
+        uppgraderaVip:        "Upgrade to VIP — €19.99/month",
+        consentText:          "AIuda Reader stores your login info and preferences locally, and your email and usage data on our servers. Text you annotate is sent to Anthropic's Claude API. The extension enables text selection within links to allow word lookup on all page types.",
+        consentLank:          "Privacy Policy",
+        consentKnapp:         "I agree",
+        consentText:          "AIuda Reader stores your login info and preferences locally, and your email and usage data on our servers. Text you annotate is sent to Anthropic's Claude API. The extension enables text selection within links to allow word lookup on all page types.",
+        consentLank:          "Privacy Policy",
+        consentKnapp:         "I agree",
 
         // --- Export markdown ---
-        exportRubrik: "AIuda Reader — Exported history",
-        exportDatum: "Exported",
-        datumLocale: "en-US",
-        exportKategori: "Category",
-        exportBeskrivning: "Description",
-        exportDu: "You",
-        exportIngenChatt: "*No chat*",
+        exportRubrik:         "AIuda Reader — Exported history",
+        exportDatum:          "Exported",
+        datumLocale:          "en-US",
+        exportKategori:       "Category",
+        exportBeskrivning:    "Description",
+        exportDu:             "You",
+        exportIngenChatt:     "*No chat*",
 
         // --- Promptar ---
-        chatOmSidan: "Chat about page",
+        chatOmSidan:        "Chat about page",
         forklaraSammanhang: "Explain this in its context.",
-        forklaraHela: "Give me an overview of this text.",
-        forklaraKategori: (k) => `Summarize what this page says about "${k}".`,
-        identifieraOrd: "Identify difficult words",
-        nivaer: ["Beginner", "Intermediate", "Advanced", "Native speaker"],
+        forklaraHela:       "Give me an overview of this text.",
+        forklaraKategori:   (k) => `Summarize what this page says about "${k}".`,
+        identifieraOrd:     "Identify difficult words",
+        nivaer:             ["Beginner", "Intermediate", "Advanced", "Native speaker"],
 
         systemPrompt: (fras, kategori, beskrivning, sammanfattning) =>
             `You are a helpful guide for text the user is reading.
@@ -74,7 +74,6 @@ The text is about: ${sammanfattning}
 The user has highlighted the phrase "${fras}" in the category "${kategori}".
 Description: ${beskrivning}
 Help the user explore and understand this phrase in its context.
-Use Markdown formatting where it adds clarity (headings, bullets, bold). Keep responses concise.
 Always respond in English, regardless of the language of the text.`,
 
         helTextSystemPrompt: (text, sammanfattning) =>
@@ -85,7 +84,6 @@ Full text:
 ${text}
 
 Help the user explore and understand the text.
-Use Markdown formatting where it adds clarity (headings, bullets, bold). Keep responses concise.
 Always respond in English, regardless of the language of the text.`,
 
         annoteringsPrompt: (text) =>
@@ -116,50 +114,50 @@ ${text}`,
 
     "en-GB": {
         // --- Popup ---
-        apiNyckel: "API Key",
-        apiPlaceholder: "sk-ant-...",
-        sparaNyckel: "Save key",
-        annoteraSidan: "Analyse this page",
-        avancerat: "Advanced...",
-        modellLabel: "Model",
-        temperatureLabel: "Temperature",
-        valjFarg: "Choose colour",
-        spara: "Save",
-        nyckelSparad: "Key saved",
-        sparad: "Saved",
+        apiNyckel:            "API Key",
+        apiPlaceholder:       "sk-ant-...",
+        sparaNyckel:          "Save key",
+        annoteraSidan:        "Analyse this page",
+        avancerat:            "Advanced...",
+        modellLabel:          "Model",
+        temperatureLabel:     "Temperature",
+        valjFarg:             "Choose colour",
+        spara:                "Save",
+        nyckelSparad:         "Key saved",
+        sparad:               "Saved",
         installningarSparade: "Settings saved",
-        opusTempNot: "Opus 5 requires temperature 1.0",
-        sprakLabel: "Language",
-        opus: "Opus 5 (most powerful)",
-        sonnet: "Sonnet 5 (balanced)",
-        haiku: "Haiku 4.5 (fastest)",
+        opusTempNot:          "Opus 4.7 requires temperature 1.0",
+        sprakLabel:           "Language",
+        opus:                 "Opus 4.7 (most powerful)",
+        sonnet:               "Sonnet 4.6 (balanced)",
+        haiku:                "Haiku 4.5 (fastest)",
 
         // --- Sidopanel ---
-        header: "AIuda Reader",
-        exportera: "↓ Export",
-        stallEnFraga: "Ask a question...",
-        ingaAndra: "No other annotations with history.",
-        valjMarkering: "Select annotation to cross-reference",
-        meddelandenSuffix: "messages",
-        nagorGickFel: "Something went wrong.",
-        kvotSlut: "You have used all your credits for this month. Upgrade your plan or purchase additional credits.",
+        header:               "AIuda Reader",
+        exportera:            "↓ Export",
+        stallEnFraga:         "Ask a question...",
+        ingaAndra:            "No other annotations with history.",
+        valjMarkering:        "Select annotation to cross-reference",
+        meddelandenSuffix:    "messages",
+        nagorGickFel:         "Something went wrong.",
+        kvotSlut:             "You have used all your credits for this month. Upgrade your plan or purchase additional credits.",
 
         // --- Export markdown ---
-        exportRubrik: "AIuda Reader — Exported history",
-        exportDatum: "Exported",
-        datumLocale: "en-GB",
-        exportKategori: "Category",
-        exportBeskrivning: "Description",
-        exportDu: "You",
-        exportIngenChatt: "*No chat*",
+        exportRubrik:         "AIuda Reader — Exported history",
+        exportDatum:          "Exported",
+        datumLocale:          "en-GB",
+        exportKategori:       "Category",
+        exportBeskrivning:    "Description",
+        exportDu:             "You",
+        exportIngenChatt:     "*No chat*",
 
         // --- Promptar ---
-        chatOmSidan: "Chat about page",
+        chatOmSidan:        "Chat about page",
         forklaraSammanhang: "Explain this in its context.",
-        forklaraHela: "Give me an overview of this text.",
-        forklaraKategori: (k) => `Summarize what this page says about "${k}".`,
-        identifieraOrd: "Identify difficult words",
-        nivaer: ["Beginner", "Intermediate", "Advanced", "Native speaker"],
+        forklaraHela:       "Give me an overview of this text.",
+        forklaraKategori:   (k) => `Summarize what this page says about "${k}".`,
+        identifieraOrd:     "Identify difficult words",
+        nivaer:             ["Beginner", "Intermediate", "Advanced", "Native speaker"],
 
         systemPrompt: (fras, kategori, beskrivning, sammanfattning) =>
             `You are a helpful guide for text the user is reading.
@@ -167,7 +165,6 @@ The text is about: ${sammanfattning}
 The user has highlighted the phrase "${fras}" in the category "${kategori}".
 Description: ${beskrivning}
 Help the user explore and understand this phrase in its context.
-Use Markdown formatting where it adds clarity (headings, bullets, bold). Keep responses concise.
 Always respond in English, regardless of the language of the text.`,
 
         helTextSystemPrompt: (text, sammanfattning) =>
@@ -178,7 +175,6 @@ Full text:
 ${text}
 
 Help the user explore and understand the text.
-Use Markdown formatting where it adds clarity (headings, bullets, bold). Keep responses concise.
 Always respond in English, regardless of the language of the text.`,
 
         annoteringsPrompt: (text) =>
@@ -209,62 +205,62 @@ ${text}`,
 
     sv: {
         // --- Popup ---
-        apiNyckel: "API-nyckel",
-        apiPlaceholder: "sk-ant-...",
-        sparaNyckel: "Spara nyckel",
-        annoteraSidan: "Analysera den här sidan",
-        avancerat: "Avancerat...",
-        modellLabel: "Modell",
-        temperatureLabel: "Temperature",
-        valjFarg: "Välj färg",
-        spara: "Spara",
-        nyckelSparad: "Nyckel sparad",
-        sparad: "Sparad",
+        apiNyckel:            "API-nyckel",
+        apiPlaceholder:       "sk-ant-...",
+        sparaNyckel:          "Spara nyckel",
+        annoteraSidan:        "Analysera den här sidan",
+        avancerat:            "Avancerat...",
+        modellLabel:          "Modell",
+        temperatureLabel:     "Temperature",
+        valjFarg:             "Välj färg",
+        spara:                "Spara",
+        nyckelSparad:         "Nyckel sparad",
+        sparad:               "Sparad",
         installningarSparade: "Inställningar sparade",
-        opusTempNot: "Opus 5 kräver temperature 1.0",
-        sprakLabel: "Språk",
-        opus: "Opus 5 (kraftfullast)",
-        sonnet: "Sonnet 5 (balanserad)",
-        haiku: "Haiku 4.5 (snabbast)",
-        modellInfoFree: "Annotering: Sonnet · Chatt: Haiku",
-        modellUppgradera: "Uppgradera till Pro eller VIP för att använda kraftfullare modeller som Opus för både annotering och chatt.",
+        opusTempNot:          "Opus 4.7 kräver temperature 1.0",
+        sprakLabel:           "Språk",
+        opus:                 "Opus 4.7 (kraftfullast)",
+        sonnet:               "Sonnet 4.6 (balanserad)",
+        haiku:                "Haiku 4.5 (snabbast)",
+        modellInfoFree:       "Annotering: Sonnet · Chatt: Haiku",
+        modellUppgradera:     "Uppgradera till Pro eller VIP för att använda kraftfullare modeller som Opus för både annotering och chatt.",
 
 
         // --- Sidopanel ---
-        header: "AIuda Reader",
-        exportera: "↓ Exportera",
-        stallEnFraga: "Ställ en fråga...",
-        ingaAndra: "Inga andra markeringar med historik.",
-        valjMarkering: "Välj markering att korsreferera",
-        meddelandenSuffix: "meddelanden",
-        nagorGickFel: "Något gick fel.",
-        kvotSlut: "Ditt tokensaldo är slut. Köp fler tokens för att fortsätta.",
-        kvotVarning: "⚠ Du närmar dig din månadsgräns.",
-        vipPlan: "VIP — obegränsat",
+        header:               "AIuda Reader",
+        exportera:            "↓ Exportera",
+        stallEnFraga:         "Ställ en fråga...",
+        ingaAndra:            "Inga andra markeringar med historik.",
+        valjMarkering:        "Välj markering att korsreferera",
+        meddelandenSuffix:    "meddelanden",
+        nagorGickFel:         "Något gick fel.",
+        kvotSlut:             "Du har använt alla krediter för denna månad. Uppgradera din plan eller köp till krediter.",
+        kvotVarning:          "⚠ Du närmar dig din månadsgräns.",
+        vipPlan:              "VIP — obegränsat",
         hanteraPrenumeration: "Hantera prenumeration →",
-        tokenSaldo: "{n} tokens kvar",
-        saldoSlut: "⚠ Ditt tokensaldo är slut — köp fler för att fortsätta.",
-        köpTokens: "Köp 1M tokens — 99 kr",
-        consentText: "AIuda Reader lagrar din inloggning och dina inställningar lokalt, samt din e-post och användningsdata på våra servrar. Text du annoterar skickas till Anthropics Claude API. Tillägget aktiverar textmarkering i länktexter för att möjliggöra orduppslagning på alla typer av sidor.",
-        consentLank: "Integritetspolicy",
-        consentKnapp: "Jag godkänner",
+        köpKrediter:          "Köp krediter",
+        uppgraderaPro:        "Uppgradera till Pro — €9,99/mån",
+        uppgraderaVip:        "Uppgradera till VIP — €19,99/mån",
+        consentText:          "AIuda Reader lagrar din inloggning och dina inställningar lokalt, samt din e-post och användningsdata på våra servrar. Text du annoterar skickas till Anthropics Claude API. Tillägget aktiverar textmarkering i länktexter för att möjliggöra orduppslagning på alla typer av sidor.",
+        consentLank:          "Integritetspolicy",
+        consentKnapp:         "Jag godkänner",
 
         // --- Export markdown ---
-        exportRubrik: "AIuda Reader — Exporterad historik",
-        exportDatum: "Exporterad",
-        datumLocale: "sv-SE",
-        exportKategori: "Kategori",
-        exportBeskrivning: "Beskrivning",
-        exportDu: "Du",
-        exportIngenChatt: "*Ingen chatt*",
+        exportRubrik:         "AIuda Reader — Exporterad historik",
+        exportDatum:          "Exporterad",
+        datumLocale:          "sv-SE",
+        exportKategori:       "Kategori",
+        exportBeskrivning:    "Beskrivning",
+        exportDu:             "Du",
+        exportIngenChatt:     "*Ingen chatt*",
 
         // --- Promptar ---
-        chatOmSidan: "Chatta om sidan",
+        chatOmSidan:        "Chatta om sidan",
         forklaraSammanhang: "Förklara detta i sitt sammanhang.",
-        forklaraHela: "Ge mig en överblick över den här texten.",
-        forklaraKategori: (k) => `Sammanfatta vad den här sidan säger om "${k}".`,
-        identifieraOrd: "Identifiera svåra ord",
-        nivaer: ["Nybörjare", "Medel", "Avancerad", "Modersmålstalare"],
+        forklaraHela:       "Ge mig en överblick över den här texten.",
+        forklaraKategori:   (k) => `Sammanfatta vad den här sidan säger om "${k}".`,
+        identifieraOrd:     "Identifiera svåra ord",
+        nivaer:             ["Nybörjare", "Medel", "Avancerad", "Modersmålstalare"],
 
         systemPrompt: (fras, kategori, beskrivning, sammanfattning) =>
             `Du är en hjälpsam guide för text som användaren läser.
@@ -272,7 +268,6 @@ Texten handlar om: ${sammanfattning}
 Användaren har markerat frasen "${fras}" i kategorin "${kategori}".
 Beskrivning: ${beskrivning}
 Hjälp användaren utforska och förstå denna fras i sitt sammanhang.
-Använd Markdown-formatering där det tillför tydlighet (rubriker, punktlistor, fetstil). Håll svaren koncisa.
 Svara alltid på svenska, oavsett vilket språk texten är skriven på.`,
 
         helTextSystemPrompt: (text, sammanfattning) =>
@@ -283,7 +278,6 @@ Hela texten:
 ${text}
 
 Hjälp användaren utforska och förstå texten.
-Använd Markdown-formatering där det tillför tydlighet (rubriker, punktlistor, fetstil). Håll svaren koncisa.
 Svara alltid på svenska, oavsett vilket språk texten är skriven på.`,
 
         annoteringsPrompt: (text) =>
@@ -317,8 +311,8 @@ ${text}`,
         annoteraSidan: "Analizar esta página", avancerat: "Avanzado...", modellLabel: "Modelo",
         temperatureLabel: "Temperatura", valjFarg: "Elegir color", spara: "Guardar",
         nyckelSparad: "Clave guardada", sparad: "Guardado", installningarSparade: "Ajustes guardados",
-        opusTempNot: "Opus 5 requiere temperatura 1.0", sprakLabel: "Idioma",
-        opus: "Opus 5 (más potente)", sonnet: "Sonnet 5 (equilibrado)", haiku: "Haiku 4.5 (más rápido)",
+        opusTempNot: "Opus 4.7 requiere temperatura 1.0", sprakLabel: "Idioma",
+        opus: "Opus 4.7 (más potente)", sonnet: "Sonnet 4.6 (equilibrado)", haiku: "Haiku 4.5 (más rápido)",
         modellInfoFree: "Anotación: Sonnet · Chat: Haiku",
         modellUppgradera: "Actualiza a Pro o VIP para usar modelos más potentes como Opus.",
         header: "AIuda Reader", exportera: "↓ Exportar", stallEnFraga: "Haz una pregunta...",

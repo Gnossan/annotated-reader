@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh project list *)",
+      "Bash(gh project view *)",
+      "Bash(gh project item-list *)",
+      "Bash(curl -s https://tri-node-poc.vercel.app/health)"
+    ]
+  }
+}
